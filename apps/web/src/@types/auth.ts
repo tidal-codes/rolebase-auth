@@ -1,0 +1,1 @@
+export type AuthStage = "LOGIN" | "REGISTER" | "CONFIRM-EMAIL"
