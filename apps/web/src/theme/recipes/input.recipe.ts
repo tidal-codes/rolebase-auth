@@ -60,7 +60,7 @@ export const inputRecipe = defineRecipe({
                     boxShadow: "0px 0px 0px 2px var(--focus-color)",
                     _invalid: {
                         borderColor: "var(--error-color)",
-                        boxShadow: "0 0 0 3px var(--error-color)",
+                        boxShadow: "0 0 0 2px var(--error-color)",
                     },
                 },
             },

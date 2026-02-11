@@ -86,6 +86,17 @@ export const buttonRecipe = defineRecipe({
                     height: "6",
                 },
             },
+            "small-icon": {
+                h: "fit-content",
+                w : "fit-content",
+                minW: "0",
+                px: "2",
+                py: "2",
+                _icon: {
+                    w: "4",
+                    h: "4"
+                }
+            }
         },
 
         variant: {
@@ -104,7 +115,7 @@ export const buttonRecipe = defineRecipe({
             subtle: {
                 bg: "colorPalette.subtle",
                 color: "colorPalette.fg",
-                borderColor: "transparent",
+                borderColor: "border",
                 _hover: {
                     bg: "colorPalette.muted",
                 },

@@ -1,37 +1,67 @@
-import { Field as BaseField, Input } from '@chakra-ui/react'
-import type React from 'react';
+import { Field as BaseField, Box, Button, Input } from '@chakra-ui/react'
+import type { ReactNode } from 'react';
+import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
-interface FieldProps {
+interface FieldProps<Fields extends FieldValues> {
     label: string | null;
     helperText?: string;
     errorText?: string;
     placeholder?: string;
-    value: string;
-    setValue: React.Dispatch<React.SetStateAction<string>>
+    disabled?: boolean;
+    invalid?: boolean;
+    inputType?: string;
+    register: UseFormRegister<Fields>
+    field: Path<Fields>;
+    showInsideButton?: boolean;
+    onInsideButtonClick?: () => void;
+    insideButtonIcon?: ReactNode;
 }
 
-const Field = ({ label, helperText, errorText, value, placeholder, setValue }: FieldProps) => {
+const Field = <Fields extends FieldValues>(props: FieldProps<Fields>) => {
     return (
-        <BaseField.Root>
-            <BaseField.Label>
-                {label}
-            </BaseField.Label>
-            <Input
-                placeholder={placeholder}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-            />
+        <BaseField.Root
+            invalid={props.invalid}
+        >
+            {props.label && (
+                <BaseField.Label>
+                    {props.label}
+                </BaseField.Label>
+            )}
+
+            <Box w="full" position="relative">
+                <Input
+                    placeholder={props.placeholder}
+                    {...props.register(props.field)}
+                    disabled={props.disabled}
+                    type={props.inputType}
+                />
+                {props.showInsideButton && (
+                    <Button
+                        position="absolute"
+                        right="2"
+                        top="50%"
+                        bottom="50%"
+                        translate="0 -50%"
+                        size="small-icon"
+                        variant="subtle"
+                        onClick={props.onInsideButtonClick}
+                    >
+                        {props.insideButtonIcon}
+                    </Button>
+                )}
+            </Box>
+
             {
-                helperText && (
+                props.helperText && (
                     <BaseField.HelperText>
-                        {helperText}
+                        {props.helperText}
                     </BaseField.HelperText>
                 )
             }
             {
-                errorText && (
-                    <BaseField.ErrorText>
-                        {errorText}
+                props.errorText && (
+                    <BaseField.ErrorText fontSize="sm">
+                        {props.errorText}
                     </BaseField.ErrorText>
                 )
             }

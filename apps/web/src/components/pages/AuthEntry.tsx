@@ -1,11 +1,9 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import AuthWrapper from "../auth/AuthWrapper";
 import LoginForm from "../auth/LoginForm";
 import { useLayoutEffect, useRef, useState } from "react";
-import PasswordForm from "../auth/PasswordForm";
 import type { AuthStage } from "../../@types/auth";
 import Register from "../auth/Register";
-import { AnimateChangeInHeight } from "../AnimateChangeInHeight";
 
 
 const AuthEntry = () => {
