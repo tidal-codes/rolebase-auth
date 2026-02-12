@@ -200,6 +200,32 @@ export async function getCurrentUser(userId: string) {
   return mapUser(data.user);
 }
 
+export async function checkEmailExists(email: string): Promise<{ email: string; exists: boolean }> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const perPage = 1000;
+  let page = 1;
+
+  while (true) {
+    const { data, error } = await supabaseAdminClient.auth.admin.listUsers({ page, perPage });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const users = data.users ?? [];
+    const exists = users.some((user) => user.email?.toLowerCase() === normalizedEmail);
+
+    if (exists || users.length < perPage) {
+      return {
+        email: normalizedEmail,
+        exists
+      };
+    }
+
+    page += 1;
+  }
+}
+
 export function refreshCookieOptions() {
   return {
     httpOnly: true,
