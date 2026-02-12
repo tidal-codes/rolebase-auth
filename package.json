@@ -1,0 +1,15 @@
+{
+  "name": "advanced-auth-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace @advanced-auth/api",
+    "dev:web": "npm run dev --workspace @advanced-auth/web",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
+    "typecheck": "npm run typecheck --workspaces"
+  }
+}
