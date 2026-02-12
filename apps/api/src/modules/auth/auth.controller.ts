@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { tokenConfig } from '../../config/constants.js';
-import { loginSchema, registerSchema } from './auth.schema.js';
-import { getCurrentUser, login, logout, refresh, refreshCookieOptions, register } from './auth.service.js';
+import { checkEmailSchema, loginSchema, registerSchema } from './auth.schema.js';
+import { checkEmailExists, getCurrentUser, login, logout, refresh, refreshCookieOptions, register } from './auth.service.js';
 
 export async function registerHandler(req: Request, res: Response) {
   const payload = registerSchema.parse(req.body);
@@ -9,6 +9,14 @@ export async function registerHandler(req: Request, res: Response) {
 
   res.cookie(tokenConfig.refreshCookieName, result.refreshToken, refreshCookieOptions());
   res.status(201).json({ success: true, data: { accessToken: result.accessToken, expiresIn: result.expiresIn, user: result.user } });
+}
+
+
+export async function checkEmailHandler(req: Request, res: Response) {
+  const payload = checkEmailSchema.parse(req.body);
+  const result = await checkEmailExists(payload.email);
+
+  res.status(200).json({ success: true, data: result });
 }
 
 export async function loginHandler(req: Request, res: Response) {
