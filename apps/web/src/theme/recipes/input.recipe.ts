@@ -6,7 +6,11 @@ export const inputRecipe = defineRecipe({
         _placeholder: {
             textTransform: "capitalize",
         },
-        rounded: "lg"
+        rounded: "lg",
+        _disabled : {
+            layerStyle : "fill.surface",
+            cursor: "disabled"
+        }
     },
 
     variants: {

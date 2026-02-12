@@ -1,11 +1,13 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
-import type { AuthStage, EmailForm, LoginFormData, PasswordForm } from "../../@types/auth";
+import { type Dispatch, type SetStateAction } from "react";
+import type { AuthStage, EmailForm, PasswordForm } from "../../@types/auth";
 import { useCheckForEmailAccount, useLogin } from "./queries";
 import { toast } from "../../utils/toaster";
 import type { UseFormHandleSubmit } from "react-hook-form";
 
 interface useLoginStageProps {
     setStage: Dispatch<SetStateAction<AuthStage>>,
+    email: string,
+    setEmail: Dispatch<SetStateAction<string>>
     showPasswordInput: Boolean,
     setShowPasswordInput: Dispatch<SetStateAction<boolean>>,
     handleEmailSubmit: UseFormHandleSubmit<EmailForm>,
@@ -14,13 +16,14 @@ interface useLoginStageProps {
 
 export default function useLoginStage(props: useLoginStageProps) {
     const { setStage,
+        email,
+        setEmail,
         showPasswordInput,
         setShowPasswordInput,
         handleEmailSubmit,
         handlePasswordSubmit } = props;
     const { check, isPending: checkingEmail } = useCheckForEmailAccount();
     const { login, isPending: loggingIn } = useLogin();
-    const [email, setEmail] = useState<string | null>(null);
 
     async function checkForEmail(data: EmailForm) {
         try {
@@ -29,6 +32,7 @@ export default function useLoginStage(props: useLoginStageProps) {
                 setEmail(data.email)
                 setShowPasswordInput(true);
             } else {
+                setEmail(data.email)
                 setStage("REGISTER");
             }
 

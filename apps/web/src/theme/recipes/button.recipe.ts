@@ -4,7 +4,12 @@ import { defineRecipe } from "@chakra-ui/react";
 export const buttonRecipe = defineRecipe({
     base: {
         textTransform: "capitalize",
-        rounded: "lg"
+        rounded: "lg",
+        _disabled: {
+            layerStyle: "fill.solid",
+            cursor: "disabled",
+            opacity : "0.9"
+        },
     },
 
     variants: {
@@ -88,7 +93,7 @@ export const buttonRecipe = defineRecipe({
             },
             "small-icon": {
                 h: "fit-content",
-                w : "fit-content",
+                w: "fit-content",
                 minW: "0",
                 px: "2",
                 py: "2",

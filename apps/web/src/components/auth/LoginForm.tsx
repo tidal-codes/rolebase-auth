@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 import { Box, Button } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormContainer from "./FormContainer";
 import type { AuthStage } from "../../@types/auth";
 import useLoginStage from "../../hooks/auth/useLoginStage";
@@ -10,33 +10,47 @@ import { Pen } from "lucide-react";
 
 interface LoginFormProps {
     setStage: React.Dispatch<React.SetStateAction<AuthStage>>
+    email: string
+    setEmail: React.Dispatch<React.SetStateAction<string>>
 }
 
 const MotionDiv = motion.create(Box);
 
-const LoginForm = ({ setStage }: LoginFormProps) => {
+const LoginForm = ({ setStage, email, setEmail }: LoginFormProps) => {
     const [showPasswordInput, setShowPasswordInput] = useState(false);
 
     const {
         register: emailRegister,
         errors: emailErros,
         resetField: resetEmail,
-        handleSubmit: handleEmailSubmit
+        handleSubmit: handleEmailSubmit,
+        setFocus: emailFormFocus,
     } = useEmailForm();
     const {
         register: passwordRegister,
         errors: passwordErros,
         resetField: resetPassword,
+        setFocus: passwordFormFocus,
         handleSubmit: handlePasswordSubmit
     } = usePasswordForm();
 
     const { submit, checkingEmail, loggingIn } = useLoginStage({
         setStage,
+        email,
+        setEmail,
         showPasswordInput,
         setShowPasswordInput,
         handleEmailSubmit,
         handlePasswordSubmit,
     });
+
+    useEffect(() => {
+        if (showPasswordInput) {
+            passwordFormFocus("password");
+        } else {
+            emailFormFocus("email");
+        }
+    }, [showPasswordInput])
 
 
     return (
@@ -60,7 +74,7 @@ const LoginForm = ({ setStage }: LoginFormProps) => {
                         key="password-field"
                         initial={{ opacity: 0, y: 15, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 15, scale: 0.95 , transition : {duration : 0.1} }}
+                        exit={{ opacity: 0, y: 15, scale: 0.95, transition: { duration: 0.1 } }}
                         transition={{
                             type: "spring",
                             stiffness: 260,

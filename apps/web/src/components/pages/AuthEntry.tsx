@@ -1,21 +1,16 @@
 import { Box } from "@chakra-ui/react";
 import AuthWrapper from "../auth/AuthWrapper";
 import LoginForm from "../auth/LoginForm";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { AuthStage } from "../../@types/auth";
-import Register from "../auth/Register";
+import RegisterForm from "../auth/RegisterForm";
+import VerificationCodeForm from "../auth/VerificationCodeForm";
+
 
 
 const AuthEntry = () => {
     const [stage, setStage] = useState<AuthStage>("LOGIN");
-    const heightRef = useRef<number | "auto">("auto");
-    const containerRef = useRef<HTMLDivElement | null>(null);
-
-    useLayoutEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-        heightRef.current = container.offsetHeight;
-    }, [stage])
+    const [email, setEmail] = useState<string>("");
 
     return (
         <AuthWrapper>
@@ -24,11 +19,23 @@ const AuthEntry = () => {
                 maxW="sm"
             >
                 {stage === "LOGIN" && (
-                    <LoginForm setStage={setStage} />
+                    <LoginForm
+                        email={email}
+                        setEmail={setEmail}
+                        setStage={setStage}
+                    />
                 )}
                 {stage === "REGISTER" && (
-                    <Register />
+                    <RegisterForm
+                        email={email}
+                        setStage={setStage}
+                    />
                 )}
+                {
+                    stage === "VERIFY-EMAIL" && (
+                        <VerificationCodeForm email={email}/>
+                    )
+                }
             </Box>
         </AuthWrapper >
     );
