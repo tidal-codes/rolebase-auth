@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
-import { checkForEmailAccount, loginUser, register, VerifyCode } from "../../api/auth";
-import type { RegisterForm, VerifyCodeForm } from "../../@types/auth";
+import { authApi, loginUser, register, VerifyCode } from "../../api/auth";
+import type { RegisterForm } from "../../@types/auth";
 
 export function useCheckForEmailAccount() {
     const mutation = useMutation({
-        mutationFn: (email: string) => checkForEmailAccount(email),
+        mutationFn: (email: string) => authApi.checkEmail({ email }),
     });
 
     return {
@@ -17,7 +17,7 @@ export function useCheckForEmailAccount() {
 
 export function useLogin() {
     const mutation = useMutation({
-        mutationFn: ({ email, password }: { email: string, password: string }) => loginUser(email, password)
+        mutationFn: ({ email, password }: { email: string, password: string }) => authApi.login({ email, password })
     })
 
     return {

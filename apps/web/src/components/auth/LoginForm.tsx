@@ -63,7 +63,6 @@ const LoginForm = ({ setStage, email, setEmail }: LoginFormProps) => {
                 disabled={showPasswordInput}
                 onInsideButtonClick={() => {
                     setShowPasswordInput(false);
-                    resetEmail("email");
                     resetPassword("password");
                 }}
                 icon={<Pen />}

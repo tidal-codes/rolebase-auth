@@ -1,3 +1,6 @@
+import type { CheckEmailResponse } from "../@types/auth";
+import { api } from "../libs/client";
+
 export async function checkForEmailAccount(email: string) {
     const data = await new Promise<{ email: string, available: boolean }>((resolve, reject) => {
         setTimeout(() => {
@@ -41,3 +44,16 @@ export async function VerifyCode(email: string, code: string) {
 
     return data;
 }
+
+
+
+
+export const authApi = {
+    checkEmail: (body: { email: string }) => {
+        return api.post<CheckEmailResponse>("auth/check-email", body)
+    },
+    login: (body: { email: string, password: string }) => {
+        return api.post("auth/login", body)
+    },
+}
+

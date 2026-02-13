@@ -27,8 +27,8 @@ export default function useLoginStage(props: useLoginStageProps) {
 
     async function checkForEmail(data: EmailForm) {
         try {
-            const checkedEmail = await check(data.email);
-            if (checkedEmail.available) {
+            const { data: { data: status } } = await check(data.email);
+            if (status.exists) {
                 setEmail(data.email)
                 setShowPasswordInput(true);
             } else {
@@ -45,7 +45,8 @@ export default function useLoginStage(props: useLoginStageProps) {
         if (!email) return;
         try {
             const user = await login({ email, password: data.password });
-            toast.info(`successfully logged in as ${user.name}`)
+            console.log(user)
+            toast.info(`successfully logged in`)
         } catch (error) {
             toast.error(`${error}`)
         }

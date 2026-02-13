@@ -11,3 +11,13 @@ export type EmailForm = z.infer<typeof emailSchema>;
 export type PasswordForm = z.infer<typeof passwordSchema>;
 export type RegisterForm = z.infer<typeof registerSchema>;
 export type VerifyCodeForm = z.infer<typeof verifyCodeSchema>;
+
+// ------- RESOPNSES ------------
+
+export interface CheckEmailResponse {
+    success: boolean,
+    data: {
+        email: string,
+        exists: boolean
+    }
+}

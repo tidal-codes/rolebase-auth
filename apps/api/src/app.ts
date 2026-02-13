@@ -10,10 +10,44 @@ import { healthRouter } from './modules/health/health.routes.js';
 
 export const app = express();
 
+const configuredCorsOrigins = env.CORS_ORIGIN.split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const isAllowedCorsOrigin = (origin?: string): boolean => {
+  if (!origin) {
+    return true;
+  }
+
+  if (configuredCorsOrigins.includes(origin)) {
+    return true;
+  }
+
+  if (env.NODE_ENV === 'development') {
+    try {
+      const parsedOrigin = new URL(origin);
+      if (parsedOrigin.hostname === 'localhost' || parsedOrigin.hostname === '127.0.0.1') {
+        return true;
+      }
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
+};
+
 app.use(helmet());
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin(origin, callback) {
+      if (isAllowedCorsOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true
   })
 );

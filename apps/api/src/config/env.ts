@@ -8,7 +8,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(4000),
   API_PREFIX: z.string().default('/api/v1'),
   APP_URL: z.string().url(),
-  CORS_ORIGIN: z.string().url(),
+  CORS_ORIGIN: z.string().min(1),
   SUPABASE_URL: z.string().url(),
   SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
