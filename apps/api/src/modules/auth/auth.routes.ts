@@ -9,6 +9,7 @@ import {
   refreshHandler,
   registerHandler,
   resendEmailConfirmationHandler,
+  sessionRemainingHandler,
   verifyEmailConfirmationHandler
 } from './auth.controller.js';
 
@@ -22,3 +23,4 @@ authRouter.post('/login', asyncHandler(loginHandler));
 authRouter.post('/refresh', asyncHandler(refreshHandler));
 authRouter.post('/logout', asyncHandler(logoutHandler));
 authRouter.get('/me', requireAuth, asyncHandler(meHandler));
+authRouter.get('/session-remaining', requireAuth, asyncHandler(sessionRemainingHandler));

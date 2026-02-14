@@ -7,6 +7,7 @@ import { env } from './config/env.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { healthRouter } from './modules/health/health.routes.js';
+import { postsRouter } from './modules/posts/posts.routes.js';
 
 export const app = express();
 
@@ -65,5 +66,6 @@ app.use(
 
 app.use(`${env.API_PREFIX}/health`, healthRouter);
 app.use(`${env.API_PREFIX}/auth`, authRouter);
+app.use(`${env.API_PREFIX}/posts`, postsRouter);
 
 app.use(errorHandler);
