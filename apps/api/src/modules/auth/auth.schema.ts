@@ -14,3 +14,12 @@ export const loginSchema = z.object({
 export const checkEmailSchema = z.object({
   email: z.string().email()
 });
+
+export const resendConfirmationSchema = z.object({
+  email: z.string().email()
+});
+
+export const verifyEmailSchema = z.object({
+  email: z.string().email(),
+  token: z.string().min(1)
+});
