@@ -1,27 +1,31 @@
-import useAuth from '../hooks/auth/useAuth';
-import { useLogout } from '../hooks/auth/queries';
-import { Button } from '@chakra-ui/react';
-import { useNavigate } from 'react-router';
+import { Box, Flex } from '@chakra-ui/react';
+import HomeHeader from '../components/HomeHeader';
+import PostsView from '../components/post/PostsView';
+import PostDialog from '../components/post/PostDialog';
+import { PostDialogProvider } from '../contexts/post/PostDialogProvider';
 
 const Home = () => {
-    const { user } = useAuth();
-    const { logout, isPending } = useLogout();
-    const navigate = useNavigate();
-
-    async function handleLogout() {
-        try {
-            await logout();
-            navigate("/auth")
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
     return (
-        <div>
-            you logged in as {user?.email}
-            <Button loading={isPending} loadingText="loging out" onClick={() => handleLogout()}>logout</Button>
-        </div>
+        <Box w="full" h="100vh">
+            <Flex
+                flexDir="column"
+                w="full"
+                h="full"
+                gap="5"
+                p="5"
+            >
+                <PostDialogProvider>
+                    <Box>
+                        <HomeHeader />
+                    </Box>
+                    <Box flex="1">
+                        <PostsView />
+                    </Box>
+                    <PostDialog />
+                </PostDialogProvider>
+            </Flex>
+        </Box>
+
     );
 }
 

@@ -3,7 +3,7 @@ import type { AuthStage } from "../../@types/auth";
 import { getAvailableEmailConfirmation, removeAvailableEmailConfirmation } from "../../utils/emailConfirmationStorage";
 
 export default function useStage() {
-    const [stage, setStage] = useState<AuthStage>("VERIFY-EMAIL");
+    const [stage, setStage] = useState<AuthStage>("LOGIN");
 
     useEffect(() => {
         const data = getAvailableEmailConfirmation();
