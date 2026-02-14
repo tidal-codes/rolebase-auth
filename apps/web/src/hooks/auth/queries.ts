@@ -48,3 +48,14 @@ export function useVerifyCode() {
         error: mutation.error
     }
 }
+
+export function useLogout() {
+    const mutation = useMutation({
+        mutationFn: () => authApi.logout()
+    })
+    return {
+        logout: mutation.mutateAsync,
+        isPending: mutation.isPending,
+        error: mutation.error
+    }
+}

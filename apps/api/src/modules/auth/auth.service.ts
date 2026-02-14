@@ -145,24 +145,30 @@ export async function refresh(currentRefreshToken: string): Promise<AuthResult> 
   const nextRefreshTokenHash = sha256(nextRefreshToken);
   const nextExpiresAt = new Date(Date.now() + tokenConfig.refreshTokenTtlMs).toISOString();
 
-  const { error: rotateError } = await supabaseAdminClient.from('auth_sessions').upsert([
-    {
-      id: sid,
-      user_id: sub,
-      revoked_at: new Date().toISOString()
-    },
-    {
-      id: nextSid,
-      user_id: sub,
-      refresh_token_hash: nextRefreshTokenHash,
-      supabase_refresh_token: refreshedSession.session.refresh_token,
-      expires_at: nextExpiresAt,
-      revoked_at: null
-    }
-  ]);
+  const revokedAt = new Date().toISOString();
 
-  if (rotateError) {
-    throw new Error(`Could not rotate refresh session: ${rotateError.message}`);
+  const { error: revokeError } = await supabaseAdminClient
+    .from('auth_sessions')
+    .update({ revoked_at: revokedAt })
+    .eq('id', sid)
+    .eq('user_id', sub)
+    .is('revoked_at', null);
+
+  if (revokeError) {
+    throw new Error(`Could not revoke current refresh session: ${revokeError.message}`);
+  }
+
+  const { error: insertError } = await supabaseAdminClient.from('auth_sessions').insert({
+    id: nextSid,
+    user_id: sub,
+    refresh_token_hash: nextRefreshTokenHash,
+    supabase_refresh_token: refreshedSession.session.refresh_token,
+    expires_at: nextExpiresAt,
+    revoked_at: null
+  });
+
+  if (insertError) {
+    throw new Error(`Could not create next refresh session: ${insertError.message}`);
   }
 
   return {

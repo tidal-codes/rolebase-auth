@@ -1,4 +1,4 @@
-import type { CheckEmailResponse } from "../@types/auth";
+import type { CheckEmailResponse, LoginResponse } from "../@types/auth";
 import { api } from "../libs/client";
 
 export async function checkForEmailAccount(email: string) {
@@ -53,7 +53,13 @@ export const authApi = {
         return api.post<CheckEmailResponse>("auth/check-email", body)
     },
     login: (body: { email: string, password: string }) => {
-        return api.post("auth/login", body)
+        return api.post<LoginResponse>("auth/login", body)
     },
+    refresh: () => {
+        return api.post<LoginResponse>("auth/refresh");
+    },
+    logout: () => {
+        return api.post("auth/logout");
+    }
 }
 

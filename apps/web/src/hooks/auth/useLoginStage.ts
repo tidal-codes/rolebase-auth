@@ -3,6 +3,8 @@ import type { AuthStage, EmailForm, PasswordForm } from "../../@types/auth";
 import { useCheckForEmailAccount, useLogin } from "./queries";
 import { toast } from "../../utils/toaster";
 import type { UseFormHandleSubmit } from "react-hook-form";
+import useAuth from "./useAuth";
+import { useNavigate } from "react-router";
 
 interface useLoginStageProps {
     setStage: Dispatch<SetStateAction<AuthStage>>,
@@ -24,6 +26,8 @@ export default function useLoginStage(props: useLoginStageProps) {
         handlePasswordSubmit } = props;
     const { check, isPending: checkingEmail } = useCheckForEmailAccount();
     const { login, isPending: loggingIn } = useLogin();
+    const { setAuth } = useAuth();
+    const navigate = useNavigate();
 
     async function checkForEmail(data: EmailForm) {
         try {
@@ -45,7 +49,11 @@ export default function useLoginStage(props: useLoginStageProps) {
         if (!email) return;
         try {
             const user = await login({ email, password: data.password });
-            console.log(user)
+            setAuth({
+                user: user.data.data.user,
+                accessToken: user.data.data.accessToken
+            })
+            navigate("/")
             toast.info(`successfully logged in`)
         } catch (error) {
             toast.error(`${error}`)
