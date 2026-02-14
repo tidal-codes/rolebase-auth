@@ -15,6 +15,77 @@ export type AuthResult = {
   };
 };
 
+type RegisterResult =
+  | AuthResult
+  | {
+      requiresEmailConfirmation: true;
+      email: string;
+    };
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+function isEmailConfirmed(user: { email_confirmed_at?: string | null }): boolean {
+  return Boolean(user.email_confirmed_at);
+}
+
+async function findUserByEmail(email: string) {
+  const normalizedEmail = normalizeEmail(email);
+  const perPage = 1000;
+  let page = 1;
+
+  while (true) {
+    const { data, error } = await supabaseAdminClient.auth.admin.listUsers({ page, perPage });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const users = data.users ?? [];
+    const matchedUser = users.find((user) => user.email?.toLowerCase() === normalizedEmail);
+
+    if (matchedUser) {
+      return matchedUser;
+    }
+
+    if (users.length < perPage) {
+      return null;
+    }
+
+    page += 1;
+  }
+}
+
+async function upsertProfile(user: { id: string; email?: string | null }, fullName: string): Promise<void> {
+  const { error } = await supabaseAdminClient.from('profiles').upsert(
+    {
+      id: user.id,
+      email: user.email ?? '',
+      full_name: fullName
+    },
+    { onConflict: 'id' }
+  );
+
+  if (error) {
+    throw new Error(`Could not persist profile: ${error.message}`);
+  }
+}
+
+async function resendSignupConfirmationEmail(email: string): Promise<void> {
+  const { error } = await supabaseAuthClient.auth.resend({
+    type: 'signup',
+    email,
+    options: {
+      emailRedirectTo: env.APP_URL
+    }
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 function mapUser(user: { id: string; email?: string | null; role?: string | null }) {
   return {
     id: user.id,
@@ -58,14 +129,32 @@ async function createWrappedSession(user: { id: string; email?: string | null; r
   };
 }
 
-export async function register(email: string, password: string, fullName: string): Promise<AuthResult> {
+export async function register(email: string, password: string, fullName: string): Promise<RegisterResult> {
+  const normalizedEmail = normalizeEmail(email);
+  const existingUser = await findUserByEmail(normalizedEmail);
+
+  if (existingUser) {
+    if (isEmailConfirmed(existingUser)) {
+      throw new Error('Email is already registered and confirmed.');
+    }
+
+    await upsertProfile(existingUser, fullName);
+    await resendSignupConfirmationEmail(normalizedEmail);
+
+    return {
+      requiresEmailConfirmation: true,
+      email: normalizedEmail
+    };
+  }
+
   const { data, error } = await supabaseAuthClient.auth.signUp({
-    email,
+    email: normalizedEmail,
     password,
     options: {
       data: {
         full_name: fullName
-      }
+      },
+      emailRedirectTo: env.APP_URL
     }
   });
 
@@ -73,15 +162,31 @@ export async function register(email: string, password: string, fullName: string
     throw new Error(error.message);
   }
 
-  if (!data.user || !data.session?.refresh_token) {
-    throw new Error('Registration succeeded but no active session returned. Check Supabase email confirmation settings.');
+  if (!data.user) {
+    throw new Error('Registration failed: no user returned by Supabase.');
+  }
+
+  await upsertProfile(data.user, fullName);
+
+  if (!isEmailConfirmed(data.user) || !data.session?.refresh_token) {
+    return {
+      requiresEmailConfirmation: true,
+      email: normalizedEmail
+    };
   }
 
   return createWrappedSession(data.user, data.session.refresh_token);
 }
 
 export async function login(email: string, password: string): Promise<AuthResult> {
-  const { data, error } = await supabaseAuthClient.auth.signInWithPassword({ email, password });
+  const normalizedEmail = normalizeEmail(email);
+  const existingUser = await findUserByEmail(normalizedEmail);
+
+  if (existingUser && !isEmailConfirmed(existingUser)) {
+    throw new Error('Please confirm your email before logging in.');
+  }
+
+  const { data, error } = await supabaseAuthClient.auth.signInWithPassword({ email: normalizedEmail, password });
 
   if (error) {
     throw new Error(error.message);
@@ -207,29 +312,54 @@ export async function getCurrentUser(userId: string) {
 }
 
 export async function checkEmailExists(email: string): Promise<{ email: string; exists: boolean }> {
-  const normalizedEmail = email.trim().toLowerCase();
-  const perPage = 1000;
-  let page = 1;
+  const normalizedEmail = normalizeEmail(email);
+  const user = await findUserByEmail(normalizedEmail);
 
-  while (true) {
-    const { data, error } = await supabaseAdminClient.auth.admin.listUsers({ page, perPage });
+  return {
+    email: normalizedEmail,
+    exists: Boolean(user && isEmailConfirmed(user))
+  };
+}
 
-    if (error) {
-      throw new Error(error.message);
-    }
+export async function resendEmailConfirmation(email: string): Promise<{ email: string; resent: boolean }> {
+  const normalizedEmail = normalizeEmail(email);
+  const existingUser = await findUserByEmail(normalizedEmail);
 
-    const users = data.users ?? [];
-    const exists = users.some((user) => user.email?.toLowerCase() === normalizedEmail);
-
-    if (exists || users.length < perPage) {
-      return {
-        email: normalizedEmail,
-        exists
-      };
-    }
-
-    page += 1;
+  if (!existingUser || isEmailConfirmed(existingUser)) {
+    return {
+      email: normalizedEmail,
+      resent: false
+    };
   }
+
+  await resendSignupConfirmationEmail(normalizedEmail);
+
+  return {
+    email: normalizedEmail,
+    resent: true
+  };
+}
+
+export async function verifyEmailConfirmation(email: string, token: string): Promise<{ email: string; verified: boolean }> {
+  const normalizedEmail = normalizeEmail(email);
+  const { data, error } = await supabaseAuthClient.auth.verifyOtp({
+    email: normalizedEmail,
+    token,
+    type: 'signup'
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (data.user) {
+    await upsertProfile(data.user, data.user.user_metadata?.full_name ?? '');
+  }
+
+  return {
+    email: normalizedEmail,
+    verified: true
+  };
 }
 
 export function refreshCookieOptions() {

@@ -21,6 +21,8 @@ npm run dev:api
 
 - `POST /api/v1/auth/register`
 - `POST /api/v1/auth/login`
+- `POST /api/v1/auth/resend-confirmation`
+- `POST /api/v1/auth/verify-email`
 - `POST /api/v1/auth/refresh`
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
@@ -37,5 +39,6 @@ npm run dev:api
 فایل migration:
 
 - `apps/api/supabase/migrations/001_auth_sessions.sql`
+- `apps/api/supabase/migrations/002_profiles.sql`
 
 این migration را در Supabase SQL Editor اجرا کنید.
