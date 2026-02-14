@@ -4,6 +4,7 @@ import { checkEmailSchema, loginSchema, registerSchema, resendConfirmationSchema
 import {
   checkEmailExists,
   getCurrentUser,
+  getSessionRemainingSeconds,
   login,
   logout,
   refresh,
@@ -85,4 +86,20 @@ export async function meHandler(req: Request, res: Response) {
 
   const user = await getCurrentUser(req.auth.userId);
   res.status(200).json({ success: true, data: user });
+}
+
+export async function sessionRemainingHandler(req: Request, res: Response) {
+  if (!req.auth?.userId) {
+    res.status(401).json({ success: false, error: 'Unauthorized.' });
+    return;
+  }
+
+  const refreshToken = req.cookies[tokenConfig.refreshCookieName];
+  if (!refreshToken) {
+    res.status(401).json({ success: false, error: 'Missing refresh cookie.' });
+    return;
+  }
+
+  const secondsRemaining = await getSessionRemainingSeconds(refreshToken, req.auth.userId);
+  res.status(200).json({ success: true, data: { secondsRemaining } });
 }
