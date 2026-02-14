@@ -31,6 +31,11 @@ export type AppRouteObject = RouteObject & {
     protected?: boolean;
 };
 
+export interface AvailableEmailConfirmType {
+    email : string,
+    expiresAt : number
+}
+
 // ------- RESOPNSES ------------
 
 export interface CheckEmailResponse {

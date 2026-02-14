@@ -1,53 +1,6 @@
 import type { CheckEmailResponse, LoginResponse } from "../@types/auth";
 import { api } from "../libs/client";
 
-export async function checkForEmailAccount(email: string) {
-    const data = await new Promise<{ email: string, available: boolean }>((resolve, reject) => {
-        setTimeout(() => {
-            resolve({ available: false, email })
-            // reject(new Error("test"))
-        }, 1000);
-    })
-
-    return data;
-}
-
-export async function loginUser(email: string, password: string) {
-    const data = await new Promise<{ name: string, email: string }>((resolve, reject) => {
-        setTimeout(() => {
-            resolve({ name: "tidal", email })
-            // reject(new Error("wrong credential"))
-        }, 1500);
-    })
-
-    return data;
-}
-
-export async function register(email: string, fullName: string, password: string) {
-    const data = await new Promise<{ name: string, email: string }>((resolve, reject) => {
-        setTimeout(() => {
-            resolve({ name: "tidal", email })
-            // reject(new Error("wrong credential"))
-        }, 1500);
-    })
-
-    return data;
-}
-
-export async function VerifyCode(email: string, code: string) {
-    const data = await new Promise<{ name: string, email: string }>((resolve, reject) => {
-        setTimeout(() => {
-            resolve({ name: "tidal", email })
-            // reject(new Error("wrong credential"))
-        }, 1500);
-    })
-
-    return data;
-}
-
-
-
-
 export const authApi = {
     checkEmail: (body: { email: string }) => {
         return api.post<CheckEmailResponse>("auth/check-email", body)
@@ -60,6 +13,16 @@ export const authApi = {
     },
     logout: () => {
         return api.post("auth/logout");
+    },
+    register: (body: { email: string, fullName: string, password: string }) => {
+        return api.post("auth/register", body)
+    },
+    verifyEmail: (body: { email: string, token: string }) => {
+        return api.post("auth/verify-email", body)
+    },
+    resendConfirmationCode: (body: { email: string }) => {
+        return api.post("auth/resend-confirmation", body)
     }
+
 }
 

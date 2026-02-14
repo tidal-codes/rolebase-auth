@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import FormContainer from "./FormContainer";
 import type { AuthStage } from "../../@types/auth";
@@ -22,7 +22,6 @@ const LoginForm = ({ setStage, email, setEmail }: LoginFormProps) => {
     const {
         register: emailRegister,
         errors: emailErros,
-        resetField: resetEmail,
         handleSubmit: handleEmailSubmit,
         setFocus: emailFormFocus,
     } = useEmailForm();
@@ -55,6 +54,9 @@ const LoginForm = ({ setStage, email, setEmail }: LoginFormProps) => {
 
     return (
         <FormContainer>
+            <Box>
+                <Text fontSize="xl">Enter Your Email</Text>
+            </Box>
             <FormInput
                 register={emailRegister}
                 errors={emailErros}

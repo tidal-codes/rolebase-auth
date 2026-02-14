@@ -10,19 +10,6 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
             fontFamily="body"
             position="relative"
         >
-            <Flex
-                position="absolute"
-                alignItems="center"
-                color="fg.info"
-                gap="1"
-                top="5"
-                left="5"
-            >
-                <ArrowLeft size="16" />
-                <Link color="inherit">
-                    <Text>Go Back</Text>
-                </Link>
-            </Flex>
             <Box
                 w="full"
                 h="full"

@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { authApi, loginUser, register, VerifyCode } from "../../api/auth";
+import { authApi } from "../../api/auth";
 import type { RegisterForm } from "../../@types/auth";
 
 export function useCheckForEmailAccount() {
@@ -29,7 +29,7 @@ export function useLogin() {
 
 export function useRegister() {
     const mutation = useMutation({
-        mutationFn: ({ email, fullName, password }: { email: string } & RegisterForm) => register(email, fullName, password)
+        mutationFn: ({ email, fullName, password }: { email: string } & RegisterForm) => authApi.register({ email, fullName, password })
     })
     return {
         register: mutation.mutateAsync,
@@ -40,7 +40,7 @@ export function useRegister() {
 
 export function useVerifyCode() {
     const mutation = useMutation({
-        mutationFn: ({ email, code }: { email: string, code: string }) => VerifyCode(email, code)
+        mutationFn: ({ email, code }: { email: string, code: string }) => authApi.verifyEmail({ email, token: code })
     })
     return {
         verify: mutation.mutateAsync,

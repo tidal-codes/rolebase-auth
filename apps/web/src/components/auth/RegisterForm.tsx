@@ -1,4 +1,4 @@
-import { Button, Input } from '@chakra-ui/react';
+import { Box, Button, Input, Text } from '@chakra-ui/react';
 import FormContainer from './FormContainer';
 import { useRegisterForm } from '../../hooks/auth/forms';
 import FormInput from './FormInput';
@@ -26,6 +26,9 @@ const RegisterForm = ({ email, setStage }: RegisterFormProps) => {
     return (
 
         <FormContainer>
+            <Box>
+                <Text fontSize="xl">Create New Account</Text>
+            </Box>
             <Input
                 value={email}
                 disabled={true}
