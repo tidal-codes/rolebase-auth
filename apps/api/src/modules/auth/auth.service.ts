@@ -4,15 +4,20 @@ import { supabaseAdminClient, supabaseAuthClient } from '../../supabase/client.j
 import { newJti, sha256 } from '../../utils/hash.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from './jwt.js';
 
+export type ProfileUser = {
+  id: string;
+  email: string;
+  role: string;
+  fullName: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AuthResult = {
   accessToken: string;
   refreshToken: string;
   expiresIn: number;
-  user: {
-    id: string;
-    email: string;
-    role: string;
-  };
+  user: ProfileUser;
 };
 
 type RegisterResult =
@@ -72,6 +77,27 @@ async function upsertProfile(user: { id: string; email?: string | null }, fullNa
   }
 }
 
+async function getProfileByUserId(userId: string): Promise<ProfileUser> {
+  const { data, error } = await supabaseAdminClient
+    .from('profiles')
+    .select('id, email, full_name, created_at, updated_at')
+    .eq('id', userId)
+    .single();
+
+  if (error || !data) {
+    throw new Error(error?.message ?? 'Could not load profile');
+  }
+
+  return {
+    id: data.id,
+    email: data.email,
+    role: 'authenticated',
+    fullName: data.full_name,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at
+  };
+}
+
 async function resendSignupConfirmationEmail(email: string): Promise<void> {
   const { error } = await supabaseAuthClient.auth.resend({
     type: 'signup',
@@ -86,22 +112,13 @@ async function resendSignupConfirmationEmail(email: string): Promise<void> {
   }
 }
 
-function mapUser(user: { id: string; email?: string | null; role?: string | null }) {
-  return {
-    id: user.id,
+async function createWrappedSession(user: { id: string; email?: string | null; role?: string | null }, supabaseRefreshToken: string): Promise<AuthResult> {
+  const sid = newJti();
+  const refreshToken = await signRefreshToken({ sub: user.id, sid });
+  const accessToken = await signAccessToken({
+    sub: user.id,
     email: user.email ?? '',
     role: user.role ?? 'authenticated'
-  };
-}
-
-async function createWrappedSession(user: { id: string; email?: string | null; role?: string | null }, supabaseRefreshToken: string): Promise<AuthResult> {
-  const mappedUser = mapUser(user);
-  const sid = newJti();
-  const refreshToken = await signRefreshToken({ sub: mappedUser.id, sid });
-  const accessToken = await signAccessToken({
-    sub: mappedUser.id,
-    email: mappedUser.email,
-    role: mappedUser.role
   });
 
   const refreshTokenHash = sha256(refreshToken);
@@ -110,7 +127,7 @@ async function createWrappedSession(user: { id: string; email?: string | null; r
 
   const { error } = await supabaseAdminClient.from('auth_sessions').insert({
     id: sid,
-    user_id: mappedUser.id,
+    user_id: user.id,
     refresh_token_hash: refreshTokenHash,
     supabase_refresh_token: supabaseRefreshToken,
     expires_at: expiresAt,
@@ -121,11 +138,13 @@ async function createWrappedSession(user: { id: string; email?: string | null; r
     throw new Error(`Could not persist session: ${error.message}`);
   }
 
+  const profile = await getProfileByUserId(user.id);
+
   return {
     accessToken,
     refreshToken,
     expiresIn: Math.floor(tokenConfig.accessTokenTtlMs / 1000),
-    user: mappedUser
+    user: profile
   };
 }
 
@@ -276,11 +295,13 @@ export async function refresh(currentRefreshToken: string): Promise<AuthResult> 
     throw new Error(`Could not create next refresh session: ${insertError.message}`);
   }
 
+  const profile = await getProfileByUserId(sub);
+
   return {
     accessToken: nextAccessToken,
     refreshToken: nextRefreshToken,
     expiresIn: Math.floor(tokenConfig.accessTokenTtlMs / 1000),
-    user: mapUser(refreshedSession.user)
+    user: profile
   };
 }
 
@@ -301,14 +322,8 @@ export async function logout(currentRefreshToken: string): Promise<void> {
     .is('revoked_at', null);
 }
 
-export async function getCurrentUser(userId: string) {
-  const { data, error } = await supabaseAdminClient.auth.admin.getUserById(userId);
-
-  if (error || !data.user) {
-    throw new Error(error?.message ?? 'Could not load user');
-  }
-
-  return mapUser(data.user);
+export async function getCurrentUser(userId: string): Promise<ProfileUser> {
+  return getProfileByUserId(userId);
 }
 
 export async function getSessionRemainingSeconds(currentRefreshToken: string, userId: string): Promise<number> {
@@ -374,7 +389,7 @@ export async function resendEmailConfirmation(email: string): Promise<{ email: s
   };
 }
 
-export async function verifyEmailConfirmation(email: string, token: string): Promise<{ email: string; verified: boolean }> {
+export async function verifyEmailConfirmation(email: string, token: string): Promise<AuthResult> {
   const normalizedEmail = normalizeEmail(email);
   const { data, error } = await supabaseAuthClient.auth.verifyOtp({
     email: normalizedEmail,
@@ -386,14 +401,13 @@ export async function verifyEmailConfirmation(email: string, token: string): Pro
     throw new Error(error.message);
   }
 
-  if (data.user) {
-    await upsertProfile(data.user, data.user.user_metadata?.full_name ?? '');
+  if (!data.user || !data.session?.refresh_token) {
+    throw new Error('Invalid authentication state from Supabase.');
   }
 
-  return {
-    email: normalizedEmail,
-    verified: true
-  };
+  await upsertProfile(data.user, data.user.user_metadata?.full_name ?? '');
+
+  return createWrappedSession(data.user, data.session.refresh_token);
 }
 
 export function refreshCookieOptions() {

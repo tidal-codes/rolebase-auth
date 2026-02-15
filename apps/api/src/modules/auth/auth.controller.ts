@@ -45,7 +45,8 @@ export async function verifyEmailConfirmationHandler(req: Request, res: Response
   const payload = verifyEmailSchema.parse(req.body);
   const result = await verifyEmailConfirmation(payload.email, payload.token);
 
-  res.status(200).json({ success: true, data: result });
+  res.cookie(tokenConfig.refreshCookieName, result.refreshToken, refreshCookieOptions());
+  res.status(200).json({ success: true, data: { accessToken: result.accessToken, expiresIn: result.expiresIn, user: result.user } });
 }
 
 export async function loginHandler(req: Request, res: Response) {
