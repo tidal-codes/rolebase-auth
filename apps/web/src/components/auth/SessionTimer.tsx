@@ -1,18 +1,21 @@
 import { Box } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const SessionTimer = ({ seconds }: { seconds: number }) => {
+    console.log(seconds)
+    const endTimeRef = useRef(Date.now() + seconds * 1000);
+
     const [secondsLeft, setSecondsLeft] = useState(seconds);
 
     useEffect(() => {
-        if (secondsLeft <= 0) return;
-
         const interval = setInterval(() => {
-            setSecondsLeft(prev => prev - 1);
+            const now = Date.now();
+            const diff = Math.max(0, Math.floor((endTimeRef.current - now) / 1000));
+            setSecondsLeft(diff);
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [secondsLeft]);
+    }, []);
 
     const minutes = Math.floor(secondsLeft / 60);
     const secs = secondsLeft % 60;
@@ -27,4 +30,5 @@ const SessionTimer = ({ seconds }: { seconds: number }) => {
 };
 
 export default SessionTimer;
+
 

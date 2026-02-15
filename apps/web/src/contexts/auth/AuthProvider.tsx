@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useState, type ReactNode } from "react";
 import type { AuthContextType, User } from "../../@types/auth";
 import { authApi } from "../../api/auth";
+import { setAxiosAccessToken } from "../../libs/client";
 
 
 
@@ -37,6 +38,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
             }
         })();
     }, [])
+
+    useEffect(() => {
+        setAxiosAccessToken(accessToken);
+    }, [accessToken])
 
     return (
         <AuthContext value={{ user, loading, accessToken, setAuth, clearAuth }}>{children}</AuthContext>

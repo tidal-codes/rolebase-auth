@@ -24,6 +24,7 @@ export const authApi = {
         return api.post("auth/resend-confirmation", body)
     },
     remainingSession: () => {
+        console.log('remaine')
         return api.get<RemainingSessionResponse>("auth/session-remaining")
     }
 

@@ -1,6 +1,6 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { authApi } from "../../api/auth";
-import type { RegisterForm } from "../../@types/auth";
+import type { RegisterForm, RemainingSessionResponse } from "../../@types/auth";
 
 export function useCheckForEmailAccount() {
     const mutation = useMutation({
@@ -57,5 +57,19 @@ export function useLogout() {
         logout: mutation.mutateAsync,
         isPending: mutation.isPending,
         error: mutation.error
+    }
+}
+
+export function useRemainingSession() {
+    const { data, isLoading } = useQuery({
+        queryKey: ["remaining-session"],
+        queryFn: authApi.remainingSession
+    })
+
+    console.log(data)
+
+    return {
+        data,
+        isLoading
     }
 }
