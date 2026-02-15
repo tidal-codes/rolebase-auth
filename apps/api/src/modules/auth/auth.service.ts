@@ -326,40 +326,6 @@ export async function getCurrentUser(userId: string): Promise<ProfileUser> {
   return getProfileByUserId(userId);
 }
 
-export async function getSessionRemainingSeconds(currentRefreshToken: string, userId: string): Promise<number> {
-  const { payload } = await verifyRefreshToken(currentRefreshToken);
-  const sid = payload.sid;
-  const sub = payload.sub;
-
-  if (!sid || !sub || typeof sid !== 'string' || typeof sub !== 'string') {
-    throw new Error('Invalid refresh token payload.');
-  }
-
-  if (sub !== userId) {
-    throw new Error('Unauthorized session access.');
-  }
-
-  const { data: existingSession, error } = await supabaseAdminClient
-    .from('auth_sessions')
-    .select('expires_at, revoked_at')
-    .eq('id', sid)
-    .eq('user_id', sub)
-    .is('revoked_at', null)
-    .maybeSingle();
-
-  if (error || !existingSession) {
-    throw new Error('Refresh session not found.');
-  }
-
-  const remainingMs = new Date(existingSession.expires_at).getTime() - Date.now();
-
-  if (remainingMs <= 0) {
-    throw new Error('Refresh session expired.');
-  }
-
-  return Math.floor(remainingMs / 1000);
-}
-
 export async function checkEmailExists(email: string): Promise<{ email: string; exists: boolean }> {
   const normalizedEmail = normalizeEmail(email);
   const user = await findUserByEmail(normalizedEmail);
@@ -418,5 +384,15 @@ export function refreshCookieOptions() {
     path: '/',
     domain: env.COOKIE_DOMAIN,
     maxAge: tokenConfig.refreshTokenTtlMs
+  };
+}
+
+export function clearRefreshCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'strict' as const,
+    path: '/',
+    domain: env.COOKIE_DOMAIN
   };
 }

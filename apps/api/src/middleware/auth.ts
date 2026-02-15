@@ -12,8 +12,14 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
 
   try {
     const { payload } = await verifyAccessToken(token);
+
+    if (!payload.sub || typeof payload.sub !== 'string') {
+      res.status(401).json({ success: false, error: 'Invalid access token payload.' });
+      return;
+    }
+
     req.auth = {
-      userId: payload.sub ?? '',
+      userId: payload.sub,
       email: String(payload.email ?? ''),
       role: String(payload.role ?? 'authenticated')
     };
