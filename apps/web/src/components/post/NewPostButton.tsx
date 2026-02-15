@@ -5,9 +5,12 @@ import usePostDialog from '../../hooks/post/usePostDialog';
 const NewPostButton = () => {
     const { handleOpen } = usePostDialog();
     return (
-        <Button onClick={() => handleOpen(true)}>
+        <Button
+            onClick={() => handleOpen(true)}
+            rounded="full"
+        >
             <Plus />
-            create new post
+            new post
         </Button>
     );
 }

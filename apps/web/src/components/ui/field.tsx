@@ -1,4 +1,4 @@
-import { Field as BaseField, Box, Button, Input } from '@chakra-ui/react'
+import { Field as BaseField, Box, Button, Input, Textarea, type TextareaProps } from '@chakra-ui/react'
 import type { ReactNode } from 'react';
 import type { FieldValues, Path, UseFormRegister } from 'react-hook-form';
 
@@ -10,11 +10,13 @@ interface FieldProps<Fields extends FieldValues> {
     disabled?: boolean;
     invalid?: boolean;
     inputType?: string;
+    textarea?: boolean;
     register: UseFormRegister<Fields>
     field: Path<Fields>;
     showInsideButton?: boolean;
     onInsideButtonClick?: () => void;
     insideButtonIcon?: ReactNode;
+    textAreaProps?: TextareaProps
 }
 
 const Field = <Fields extends FieldValues>(props: FieldProps<Fields>) => {
@@ -29,12 +31,23 @@ const Field = <Fields extends FieldValues>(props: FieldProps<Fields>) => {
             )}
 
             <Box w="full" position="relative">
-                <Input
-                    placeholder={props.placeholder}
-                    {...props.register(props.field)}
-                    disabled={props.disabled}
-                    type={props.inputType}
-                />
+
+                {
+                    Boolean(props.textarea) ? (
+                        <Textarea
+                            {...props.textAreaProps}
+                        />
+                    ) : (
+                        <Input
+                            placeholder={props.placeholder}
+                            {...props.register(props.field)}
+                            disabled={props.disabled}
+                            type={props.inputType}
+                        />
+                    )
+                }
+
+
                 {props.showInsideButton && (
                     <Button
                         position="absolute"

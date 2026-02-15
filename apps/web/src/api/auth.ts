@@ -1,4 +1,4 @@
-import type { CheckEmailResponse, LoginResponse } from "../@types/auth";
+import type { CheckEmailResponse, LoginResponse, RemainingSessionResponse } from "../@types/auth";
 import { api } from "../libs/client";
 
 export const authApi = {
@@ -22,6 +22,9 @@ export const authApi = {
     },
     resendConfirmationCode: (body: { email: string }) => {
         return api.post("auth/resend-confirmation", body)
+    },
+    remainingSession: () => {
+        return api.get<RemainingSessionResponse>("auth/session-remaining")
     }
 
 }

@@ -32,8 +32,8 @@ export type AppRouteObject = RouteObject & {
 };
 
 export interface AvailableEmailConfirmType {
-    email : string,
-    expiresAt : number
+    email: string,
+    expiresAt: number
 }
 
 // ------- RESOPNSES ------------
@@ -52,5 +52,12 @@ export interface LoginResponse {
         accessToken: string;
         expiresIn: number;
         user: User;
+    }
+}
+
+export interface RemainingSessionResponse {
+    success: boolean;
+    data: {
+        secondsRemaining: number;
     }
 }

@@ -8,7 +8,7 @@ export const buttonRecipe = defineRecipe({
         _disabled: {
             layerStyle: "fill.solid",
             cursor: "disabled",
-            opacity : "0.9"
+            opacity: "0.9"
         },
     },
 
@@ -100,6 +100,17 @@ export const buttonRecipe = defineRecipe({
                 _icon: {
                     w: "4",
                     h: "4"
+                }
+            },
+            "medium-icon": {
+                h: "fit-content",
+                w: "fit-content",
+                minW: "0",
+                px: "2",
+                py: "2",
+                _icon: {
+                    w: "5",
+                    h: "5"
                 }
             }
         },

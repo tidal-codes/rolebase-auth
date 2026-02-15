@@ -16,6 +16,7 @@ const Dialog = ({ trigger, open, setOpen, children }: DialogProps) => {
             open={open}
             onOpenChange={(e) => setOpen(e.open)}
             placement={"center"}
+            size="lg"
         >
             {trigger && (
                 <BaseDialog.Trigger asChild>

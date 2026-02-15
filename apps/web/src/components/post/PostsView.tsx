@@ -12,9 +12,9 @@ const PostsView = () => {
                 templateColumns={{
                     base: "1fr",
                     md: "repeat(3, 1fr)",
-                    xl: "repeat(5, 1fr)",
+                    xl: "repeat(4, 1fr)",
                 }}
-                gap={6}
+                gap={3}
             >
                 <PostCard />
                 <PostCard />

@@ -1,9 +1,14 @@
-import { Box, Button, Flex, Input, Textarea } from "@chakra-ui/react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 import Dialog from "../ui/dialog";
 import usePostDialog from "../../hooks/post/usePostDialog";
+import Field from "../ui/field";
+import { usePostForm } from "../../hooks/post/forms";
+import usePostEditor from "../../hooks/post/usePostEditor";
 
 const PostDialog = () => {
     const { open, handleOpen } = usePostDialog();
+    const { register, reset, handleSubmit, errors } = usePostForm();
+    const { addPost } = usePostEditor({ handleSubmit });
     return (
         <Dialog
             open={open}
@@ -18,15 +23,52 @@ const PostDialog = () => {
                     gap="2"
                     flexDirection="column"
                 >
-                    <Input placeholder="enter post title" />
-                    <Textarea
-                        placeholder="write your post"
-                        h="220px"
-                        resize="none"
+                    <Field
+                        register={register}
+                        field="title"
+                        invalid={Boolean(errors.title?.message)}
+                        errorText={errors.title?.message}
+                        label={null}
+                        placeholder="title"
                     />
-                    <Flex gap="2">
-                        <Button size="xs">publish</Button>
-                        <Button variant="subtle" size="xs">cancel</Button>
+                    <Field
+                        register={register}
+                        field="postText"
+                        invalid={Boolean(errors.postText?.message)}
+                        errorText={errors.postText?.message}
+                        label={null}
+                        textarea
+                        textAreaProps={{
+                            placeholder: "write your post",
+                            resize: "none",
+                            h: "220px"
+                        }}
+                    />
+                    <Flex
+                        gap="2"
+                        mt="9"
+                        pt="3"
+                        borderTop="1px solid"
+                        borderColor="border"
+                    >
+                        <Button
+                            size="xs"
+                            onClick={() => addPost()}
+                        >
+                            publish
+                        </Button>
+                        <Button
+                            variant="subtle"
+                            size="xs"
+                            onClick={() => {
+                                handleOpen(false);
+                                setTimeout(() => {
+                                    reset();
+                                }, 300);
+                            }}
+                        >
+                            cancel
+                        </Button>
                     </Flex>
                 </Flex>
             </Box>
