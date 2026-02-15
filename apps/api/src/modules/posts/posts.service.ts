@@ -59,6 +59,18 @@ function mapPostRecord(record: RawPostRecord): PostRecord {
   };
 }
 
+async function ensurePostExists(postId: string): Promise<void> {
+  const { data, error } = await supabaseAdminClient.from('posts').select('id').eq('id', postId).maybeSingle();
+
+  if (error) {
+    throw new Error(`Could not verify post: ${error.message}`);
+  }
+
+  if (!data) {
+    throw new Error('Post not found.');
+  }
+}
+
 export async function createPost(userId: string, title: string, body: string): Promise<PostRecord> {
   const { data, error } = await supabaseAdminClient
     .from('posts')
@@ -120,6 +132,8 @@ export async function listPosts(): Promise<PostRecord[]> {
 }
 
 export async function likePost(userId: string, postId: string): Promise<LikeRecord> {
+  await ensurePostExists(postId);
+
   const { data, error } = await supabaseAdminClient
     .from('likes')
     .upsert({ user_id: userId, post_id: postId }, { onConflict: 'user_id,post_id' })
@@ -142,6 +156,8 @@ export async function unlikePost(userId: string, postId: string): Promise<void> 
 }
 
 export async function bookmarkPost(userId: string, postId: string): Promise<BookmarkRecord> {
+  await ensurePostExists(postId);
+
   const { data, error } = await supabaseAdminClient
     .from('bookmarks')
     .upsert({ user_id: userId, post_id: postId }, { onConflict: 'user_id,post_id' })
