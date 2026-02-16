@@ -22,7 +22,6 @@ function getAuthenticatedUserId(req: Request): string {
 }
 
 export async function createPostHandler(req: Request, res: Response) {
-  console.log(req)
   const userId = getAuthenticatedUserId(req);
   const payload = createPostSchema.parse(req.body);
   const post = await createPost(userId, payload.title, payload.body);
@@ -47,8 +46,9 @@ export async function deletePostHandler(req: Request, res: Response) {
   res.status(200).json({ success: true, data: { deleted: true } });
 }
 
-export async function listPostsHandler(_req: Request, res: Response) {
-  const posts = await listPosts();
+export async function listPostsHandler(req: Request, res: Response) {
+  const userId = getAuthenticatedUserId(req);
+  const posts = await listPosts(userId);
   res.status(200).json({ success: true, data: posts });
 }
 

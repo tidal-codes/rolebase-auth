@@ -7,6 +7,8 @@ export type PostRecord = {
   body: string;
   created_at: string;
   updated_at: string;
+  liked: boolean;
+  saved: boolean;
   author: {
     id: string;
     full_name: string;
@@ -40,7 +42,7 @@ export type BookmarkRecord = {
   created_at: string;
 };
 
-function mapPostRecord(record: RawPostRecord): PostRecord {
+function mapPostRecord(record: RawPostRecord, interactions: { liked: boolean; saved: boolean }): PostRecord {
   if (!record.profiles) {
     throw new Error('Could not load post author profile.');
   }
@@ -52,11 +54,62 @@ function mapPostRecord(record: RawPostRecord): PostRecord {
     body: record.body,
     created_at: record.created_at,
     updated_at: record.updated_at,
+    liked: interactions.liked,
+    saved: interactions.saved,
     author: {
       id: record.profiles.id,
       full_name: record.profiles.full_name
     }
   };
+}
+
+
+async function getPostInteractions(userId: string, postIds: string[]): Promise<Map<string, { liked: boolean; saved: boolean }>> {
+  const interactions = new Map<string, { liked: boolean; saved: boolean }>();
+
+  for (const postId of postIds) {
+    interactions.set(postId, { liked: false, saved: false });
+  }
+
+  if (postIds.length === 0) {
+    return interactions;
+  }
+
+  const { data: likedPosts, error: likesError } = await supabaseAdminClient
+    .from('likes')
+    .select('post_id')
+    .eq('user_id', userId)
+    .in('post_id', postIds);
+
+  if (likesError) {
+    throw new Error(`Could not load likes state: ${likesError.message}`);
+  }
+
+  for (const item of likedPosts ?? []) {
+    const current = interactions.get(item.post_id);
+    if (current) {
+      current.liked = true;
+    }
+  }
+
+  const { data: savedPosts, error: bookmarksError } = await supabaseAdminClient
+    .from('bookmarks')
+    .select('post_id')
+    .eq('user_id', userId)
+    .in('post_id', postIds);
+
+  if (bookmarksError) {
+    throw new Error(`Could not load bookmarks state: ${bookmarksError.message}`);
+  }
+
+  for (const item of savedPosts ?? []) {
+    const current = interactions.get(item.post_id);
+    if (current) {
+      current.saved = true;
+    }
+  }
+
+  return interactions;
 }
 
 async function ensurePostExists(postId: string): Promise<void> {
@@ -82,7 +135,7 @@ export async function createPost(userId: string, title: string, body: string): P
     throw new Error(`Could not create post: ${error?.message ?? 'Unknown error'}`);
   }
 
-  return mapPostRecord(data);
+  return mapPostRecord(data, { liked: false, saved: false });
 }
 
 export async function updatePost(userId: string, postId: string, title: string, body: string): Promise<PostRecord> {
@@ -102,7 +155,8 @@ export async function updatePost(userId: string, postId: string, title: string, 
     throw new Error('Post not found or unauthorized.');
   }
 
-  return mapPostRecord(data);
+  const interactions = await getPostInteractions(userId, [data.id]);
+  return mapPostRecord(data, interactions.get(data.id) ?? { liked: false, saved: false });
 }
 
 export async function deletePost(userId: string, postId: string): Promise<void> {
@@ -117,7 +171,7 @@ export async function deletePost(userId: string, postId: string): Promise<void> 
   }
 }
 
-export async function listPosts(): Promise<PostRecord[]> {
+export async function listPosts(userId: string): Promise<PostRecord[]> {
   const { data, error } = await supabaseAdminClient
     .from('posts')
     .select('id, user_id, title, body, created_at, updated_at, profiles!posts_user_id_fkey(id, full_name)')
@@ -128,7 +182,10 @@ export async function listPosts(): Promise<PostRecord[]> {
     throw new Error(`Could not load posts: ${error.message}`);
   }
 
-  return (data ?? []).map(mapPostRecord);
+  const posts = data ?? [];
+  const interactions = await getPostInteractions(userId, posts.map((post) => post.id));
+
+  return posts.map((post) => mapPostRecord(post, interactions.get(post.id) ?? { liked: false, saved: false }));
 }
 
 export async function likePost(userId: string, postId: string): Promise<LikeRecord> {

@@ -114,7 +114,8 @@ async function resendSignupConfirmationEmail(email: string): Promise<void> {
 
 async function createWrappedSession(user: { id: string; email?: string | null; role?: string | null }, supabaseRefreshToken: string): Promise<AuthResult> {
   const sid = newJti();
-  const refreshToken = await signRefreshToken({ sub: user.id, sid });
+  const expiresAtDate = new Date(Date.now() + tokenConfig.refreshTokenTtlMs);
+  const refreshToken = await signRefreshToken({ sub: user.id, sid }, expiresAtDate);
   const accessToken = await signAccessToken({
     sub: user.id,
     email: user.email ?? '',
@@ -122,8 +123,7 @@ async function createWrappedSession(user: { id: string; email?: string | null; r
   });
 
   const refreshTokenHash = sha256(refreshToken);
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + tokenConfig.refreshTokenTtlMs).toISOString();
+  const expiresAt = expiresAtDate.toISOString();
 
   const { error } = await supabaseAdminClient.from('auth_sessions').insert({
     id: sid,
@@ -259,7 +259,8 @@ export async function refresh(currentRefreshToken: string): Promise<AuthResult> 
   }
 
   const nextSid = newJti();
-  const nextRefreshToken = await signRefreshToken({ sub, sid: nextSid });
+  const fixedSessionExpiry = new Date(existingSession.expires_at);
+  const nextRefreshToken = await signRefreshToken({ sub, sid: nextSid }, fixedSessionExpiry);
   const nextAccessToken = await signAccessToken({
     sub,
     email: refreshedSession.user.email ?? '',
@@ -267,7 +268,7 @@ export async function refresh(currentRefreshToken: string): Promise<AuthResult> 
   });
 
   const nextRefreshTokenHash = sha256(nextRefreshToken);
-  const nextExpiresAt = new Date(Date.now() + tokenConfig.refreshTokenTtlMs).toISOString();
+  const nextExpiresAt = fixedSessionExpiry.toISOString();
 
   const revokedAt = new Date().toISOString();
 
