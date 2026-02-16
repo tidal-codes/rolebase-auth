@@ -5,6 +5,7 @@ import {
 } from "@chakra-ui/react"
 import { buttonRecipe } from "./recipes/button.recipe"
 import { inputRecipe } from "./recipes/input.recipe"
+import { textareaRecipe } from "./recipes/textarea.recipe"
 
 const config = defineConfig({
     theme: {
@@ -26,11 +27,12 @@ const config = defineConfig({
                     }
                 }
             },
-            
+
         },
         recipes: {
             button: buttonRecipe,
-            input: inputRecipe
+            input: inputRecipe,
+            textarea: textareaRecipe
         },
 
     },

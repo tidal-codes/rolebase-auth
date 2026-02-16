@@ -10,6 +10,12 @@ export const buttonRecipe = defineRecipe({
             cursor: "disabled",
             opacity: "0.9"
         },
+        focusVisibleRing: "none",
+        "--focus-color": "colors.colorPalette.focusRing",
+        transition: "box-shadow 0.25s ease",
+        _focusVisible: {
+            boxShadow: "0px 0px 0px 2px var(--focus-color)",
+        },
     },
 
     variants: {

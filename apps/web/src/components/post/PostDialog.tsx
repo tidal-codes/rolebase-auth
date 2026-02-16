@@ -1,18 +1,16 @@
 import { Box, Button, Flex } from "@chakra-ui/react";
 import Dialog from "../ui/dialog";
-import usePostDialog from "../../hooks/post/usePostDialog";
 import Field from "../ui/field";
 import { usePostForm } from "../../hooks/post/forms";
 import usePostEditor from "../../hooks/post/usePostEditor";
 
 const PostDialog = () => {
-    const { open, handleOpen } = usePostDialog();
     const { register, reset, handleSubmit, errors } = usePostForm();
-    const { addPost } = usePostEditor({ handleSubmit });
+    const { addPost, openDialog, setOpenDialog } = usePostEditor({ handleSubmit , reset});
     return (
         <Dialog
-            open={open}
-            setOpen={handleOpen}
+            open={openDialog}
+            setOpen={setOpenDialog}
         >
             <Box
                 p="4"
@@ -53,7 +51,9 @@ const PostDialog = () => {
                     >
                         <Button
                             size="xs"
-                            onClick={() => addPost()}
+                            onClick={() => {
+                                addPost();
+                            }}
                         >
                             publish
                         </Button>
@@ -61,7 +61,7 @@ const PostDialog = () => {
                             variant="subtle"
                             size="xs"
                             onClick={() => {
-                                handleOpen(false);
+                                setOpenDialog(false);
                                 setTimeout(() => {
                                     reset();
                                 }, 300);
