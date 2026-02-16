@@ -35,6 +35,13 @@ export interface PostStore {
     setPostSaved: (id: string, saved: boolean) => void;
 }
 
+export interface SearchStore {
+    search: string;
+    searchResultCount: number,
+    setSearch: (search: string) => void
+    setSearchResultCount: (number: number) => void
+}
+
 // ------ Responses ---------
 
 export interface GetPostsResponse {

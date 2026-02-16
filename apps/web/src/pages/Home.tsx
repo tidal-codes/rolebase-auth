@@ -5,6 +5,7 @@ import PostDialog from '../components/post/PostDialog';
 import { PostDialogProvider } from '../contexts/post/PostDialogProvider';
 import PatternBackground from '../components/PatternBackground';
 import useSyncPostStore from '../hooks/post/useSyncPostStore';
+import SearchedSection from '../components/post/SearchedSection';
 
 const Home = () => {
     useSyncPostStore();
@@ -22,6 +23,9 @@ const Home = () => {
                     <PostDialogProvider>
                         <Box>
                             <HomeHeader />
+                        </Box>
+                        <Box>
+                            <SearchedSection />
                         </Box>
                         <Box flex="1">
                             <PostsView />
