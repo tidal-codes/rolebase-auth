@@ -25,12 +25,16 @@ export async function signAccessToken(payload: AccessTokenPayload): Promise<stri
     .sign(accessSecret);
 }
 
-export async function signRefreshToken(payload: RefreshTokenPayload): Promise<string> {
+export async function signRefreshToken(payload: RefreshTokenPayload, expiresAt?: Date): Promise<string> {
+  const expiration = expiresAt
+    ? Math.floor(expiresAt.getTime() / 1000)
+    : `${Math.floor(tokenConfig.refreshTokenTtlMs / 1000)}s`;
+
   return new SignJWT({ sid: payload.sid })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(payload.sub)
     .setIssuedAt()
-    .setExpirationTime(`${Math.floor(tokenConfig.refreshTokenTtlMs / 1000)}s`)
+    .setExpirationTime(expiration)
     .sign(refreshSecret);
 }
 
