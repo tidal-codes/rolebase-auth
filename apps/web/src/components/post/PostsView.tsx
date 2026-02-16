@@ -1,8 +1,10 @@
-import { Box, For, Grid } from '@chakra-ui/react';
-import PostCard from './PostCard';
+import { Box, Flex, For, Grid } from '@chakra-ui/react';
 import { usePosts } from '../../hooks/post/queries';
-import { usePostStore } from '../../stores/posts';
+import { usePostStore, usePostViewStore } from '../../stores/posts';
 import { useSearchStore } from '../../stores/search';
+import SegmentGroup from '../ui/segmentGroup';
+import type { PostView } from '../../@types/post';
+import PostCard from './PostCard';
 
 const PostsView = () => {
     const { isLoading } = usePosts();
@@ -10,6 +12,8 @@ const PostsView = () => {
     const postsById = usePostStore(state => state.postsById);
     const search = useSearchStore(state => state.search);
     const setSearchResultCount = useSearchStore(state => state.setSearchResultCount);
+    const setView = usePostViewStore(state => state.setView);
+    const view = usePostViewStore(state => state.view);
 
     function getPosts() {
         const query = search.trim().toLowerCase();
@@ -25,11 +29,20 @@ const PostsView = () => {
     }
 
     return (
-        <Box
+        <Flex
             w="full"
             h="full"
+            flexDir="column"
+            gap="5"
             py="3"
         >
+            <Box>
+                <SegmentGroup
+                    value={view}
+                    setValue={(value) => setView(value as PostView)}
+                    items={["All", "Liked", "Saved"] as PostView[]}
+                />
+            </Box>
             <Grid
                 templateColumns={{
                     base: "1fr",
@@ -54,7 +67,7 @@ const PostsView = () => {
                 }
 
             </Grid>
-        </Box>
+        </Flex>
     );
 }
 

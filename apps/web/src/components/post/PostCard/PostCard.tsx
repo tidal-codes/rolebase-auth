@@ -1,7 +1,8 @@
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { Bookmark, ThumbsUp } from "lucide-react";
-import Avatar from "../ui/avatar";
-import { usePostStore } from "../../stores/posts";
+import { usePostStore } from "../../../stores/posts";
+import Actions from "./Actions";
+import Avatar from "../../ui/avatar";
+import { Flex, Text, Box, Button } from "@chakra-ui/react";
+import ActionsMenu from "./ActionsMenu";
 
 interface PostCardProps {
     postId: string
@@ -39,27 +40,18 @@ const PostCard = ({ postId }: PostCardProps) => {
                 gap="1"
                 backgroundColor="white"
             >
-                <Text fontSize="lg">{title}</Text>
+                <Flex alignItems="center" justifyContent="space-between">
+                    <Text fontSize="lg">{title}</Text>
+                    <ActionsMenu postId={postId} />
+                </Flex>
+
                 <Text fontSize="sm" color="fg.muted">{body.slice(0, 25)}</Text>
                 <Flex
                     mt="3"
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Box>
-                        <Button
-                            variant="ghost"
-                            size="medium-icon"
-                        >
-                            <ThumbsUp />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="medium-icon"
-                        >
-                            <Bookmark />
-                        </Button>
-                    </Box>
+                    <Actions />
                     <Box>
                         <Avatar name={full_name} size="sm" />
                     </Box>

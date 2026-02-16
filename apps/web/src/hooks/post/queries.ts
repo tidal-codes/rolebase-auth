@@ -37,6 +37,7 @@ export function useAddPost() {
                 updated_at: new Date().toISOString(),
                 liked: false,
                 saved: false,
+                pending: true,
                 author: {
                     id: user!.id,
                     full_name: user!.email

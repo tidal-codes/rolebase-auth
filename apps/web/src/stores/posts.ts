@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { PostStore } from "../@types/post";
+import type { PostStore, PostViewStore } from "../@types/post";
 
 export const usePostStore = create<PostStore>((set) => ({
 
@@ -16,7 +16,7 @@ export const usePostStore = create<PostStore>((set) => ({
                 [post.id]: post
             }
         })),
-        
+
     updatePost: (post) =>
         set((state) => ({
             postsById: {
@@ -56,3 +56,10 @@ export const usePostStore = create<PostStore>((set) => ({
             }
         })),
 }));
+
+export const usePostViewStore = create<PostViewStore>(set => ({
+    view: "All",
+    setView: (view) => set(() => ({
+        view
+    }))
+}))

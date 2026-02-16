@@ -17,6 +17,7 @@ export interface Post {
     updated_at: string;
     liked: boolean;
     saved: boolean;
+    pending?: boolean;
     author: {
         id: string;
         full_name: string;
@@ -40,6 +41,13 @@ export interface SearchStore {
     searchResultCount: number,
     setSearch: (search: string) => void
     setSearchResultCount: (number: number) => void
+}
+
+export type PostView = "All" | "Liked" | "Saved";
+
+export interface PostViewStore {
+    view: PostView
+    setView: (view: PostView) => void
 }
 
 // ------ Responses ---------
