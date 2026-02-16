@@ -1,17 +1,11 @@
+import type { GetPostResponse, GetPostsResponse } from "../@types/post"
 import { api } from "../libs/client"
 
 export const postApi = {
-    addNewPost : () => {
-        return api.post("posts")
+    addNewPost: (body: { title: string, body: string }) => {
+        return api.post<GetPostResponse>("posts", body)
     },
-    updatePost : () => {
-        return api.post("")
+    getPosts: () => {
+        return api.get<GetPostsResponse>("posts")
     }
 }
-
-postsRouter.get('/', asyncHandler(listPostsHandler));
-postsRouter.post('/', asyncHandler(createPostHandler));
-postsRouter.post('/:postId/likes', asyncHandler(likePostHandler));
-postsRouter.post('/:postId/bookmarks', asyncHandler(bookmarkPostHandler));
-postsRouter.get('/likes', asyncHandler(listLikesHandler));
-postsRouter.get('/bookmarks', asyncHandler(listBookmarksHandler));

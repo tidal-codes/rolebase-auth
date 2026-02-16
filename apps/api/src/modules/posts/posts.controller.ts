@@ -22,6 +22,7 @@ function getAuthenticatedUserId(req: Request): string {
 }
 
 export async function createPostHandler(req: Request, res: Response) {
+  console.log(req)
   const userId = getAuthenticatedUserId(req);
   const payload = createPostSchema.parse(req.body);
   const post = await createPost(userId, payload.title, payload.body);

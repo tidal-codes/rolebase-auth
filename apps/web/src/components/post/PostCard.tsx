@@ -1,8 +1,16 @@
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { Bookmark, ThumbsUp } from "lucide-react";
 import Avatar from "../ui/avatar";
+import { usePostStore } from "../../stores/posts";
 
-const PostCard = () => {
+interface PostCardProps {
+    postId: string
+
+}
+
+const PostCard = ({ postId }: PostCardProps) => {
+    const postsById = usePostStore(state => state.postsById);
+    const { title, body, author: { full_name } } = postsById[postId];
     return (
         <Box
             p="1"
@@ -31,8 +39,8 @@ const PostCard = () => {
                 gap="1"
                 backgroundColor="white"
             >
-                <Text fontSize="lg">post title</Text>
-                <Text color="fg.muted">this is a post description and it really is</Text>
+                <Text fontSize="lg">{title}</Text>
+                <Text fontSize="sm" color="fg.muted">{body.slice(0, 25)}</Text>
                 <Flex
                     mt="3"
                     justifyContent="space-between"
@@ -53,7 +61,7 @@ const PostCard = () => {
                         </Button>
                     </Box>
                     <Box>
-                        <Avatar name="taha darvishi" size="sm" />
+                        <Avatar name={full_name} size="sm" />
                     </Box>
                 </Flex>
             </Flex>

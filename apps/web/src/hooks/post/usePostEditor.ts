@@ -1,5 +1,6 @@
 import type { UseFormHandleSubmit } from "react-hook-form";
 import type { PostForm } from "../../@types/post";
+import { useAddPost } from "./queries";
 
 interface UsePostEditorProps {
     handleSubmit: UseFormHandleSubmit<PostForm>
@@ -7,8 +8,10 @@ interface UsePostEditorProps {
 
 export default function usePostEditor(props: UsePostEditorProps) {
 
+    const { add } = useAddPost();
+
     function handleAddPost(data: PostForm) {
-        console.log(data)
+        add({ title: data.title, body: data.postText })
     }
 
     const addPost = props.handleSubmit(handleAddPost);

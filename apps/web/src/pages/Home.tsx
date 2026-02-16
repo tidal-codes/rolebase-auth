@@ -4,8 +4,10 @@ import PostsView from '../components/post/PostsView';
 import PostDialog from '../components/post/PostDialog';
 import { PostDialogProvider } from '../contexts/post/PostDialogProvider';
 import PatternBackground from '../components/PatternBackground';
+import useSyncPostStore from '../hooks/post/useSyncPostStore';
 
 const Home = () => {
+    useSyncPostStore();
     return (
         <Box w="full" h="100vh">
             <PatternBackground>

@@ -35,6 +35,7 @@ const Field = <Fields extends FieldValues>(props: FieldProps<Fields>) => {
                 {
                     Boolean(props.textarea) ? (
                         <Textarea
+                            {...props.register(props.field)}
                             {...props.textAreaProps}
                         />
                     ) : (

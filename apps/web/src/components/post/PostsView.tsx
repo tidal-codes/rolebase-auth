@@ -1,7 +1,11 @@
-import { Box, Grid } from '@chakra-ui/react';
+import { Box, For, Grid } from '@chakra-ui/react';
 import PostCard from './PostCard';
+import { usePosts } from '../../hooks/post/queries';
+import { usePostStore } from '../../stores/posts';
 
 const PostsView = () => {
+    const { isLoading } = usePosts();
+    const postIds = usePostStore(state => state.postIds);
     return (
         <Box
             w="full"
@@ -16,10 +20,21 @@ const PostsView = () => {
                 }}
                 gap={3}
             >
-                <PostCard />
-                <PostCard />
-                <PostCard />
-                <PostCard />
+                {
+                    isLoading ? (
+                        "isLoading"
+                    ) : (
+                        <For each={postIds}>
+                            {(id) => {
+                                return <PostCard
+                                    key={id}
+                                    postId={id}
+                                />
+                            }}
+                        </For>
+                    )
+                }
+
             </Grid>
         </Box>
     );

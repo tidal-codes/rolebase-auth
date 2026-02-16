@@ -7,3 +7,41 @@ export interface PostDialogContextType {
     toggleOpen: () => void
 }
 export type PostForm = z.infer<typeof postSchema>;
+
+export interface Post {
+    id: string;
+    user_id: string;
+    title: string;
+    body: string;
+    created_at: string;
+    updated_at: string;
+    liked: boolean;
+    saved: boolean;
+    author: {
+        id: string;
+        full_name: string;
+    }
+}
+
+export interface PostStore {
+    postIds: string[];
+    postsById: Record<string, Post>;
+
+    addPost: (post: Post) => void;
+    updatePost: (post: Post) => void;
+    removePost: (postId: string) => void;
+
+    setPostLiked: (id: string, liked: boolean) => void;
+    setPostSaved: (id: string, saved: boolean) => void;
+}
+
+// ------ Responses ---------
+
+export interface GetPostsResponse {
+    success: boolean;
+    data: Post[]
+}
+export interface GetPostResponse {
+    success: boolean;
+    data: Post
+}
