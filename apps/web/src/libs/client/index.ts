@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosHeaders, type AxiosRequestConfig, type InternalAxiosRequestConfig } from "axios";
-import type { LoginResponse } from "../../@types/auth";
+import { authApi } from "../../api/auth";
 
 export const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -7,13 +7,27 @@ export const api = axios.create({
     withCredentials: true
 });
 
-type RetryableRequestConfig = InternalAxiosRequestConfig & { _retry?: boolean; };
 
 let accessToken: string | null = null;
 let isRefreshing = false;
-let refreshPromise: Promise<string> | null = null;
+let axiosLogoutFn: () => void;
+let failedQueue: {
+    resolve: (value: any) => void;
+    reject: (reason: any) => void;
+}[] = [];
+
+
+const processQueue = (error: any, token: string | null = null) => {
+    failedQueue.forEach(prom => {
+        if (error) prom.reject(error);
+        else prom.resolve(token);
+    });
+    failedQueue = [];
+};
+
 
 export const setAxiosAccessToken = (token: string | null): void => { accessToken = token; };
+export const setAxiosLogoutFn = (fn: () => void) => { axiosLogoutFn = fn }
 
 
 const withAuthorizationHeader = (headers: AxiosRequestConfig["headers"], token: string): AxiosHeaders => {
@@ -29,37 +43,54 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     return config;
 })
 
-// api.interceptors.response.use((response) => response, async (error: AxiosError) => {
-//     return Promise.reject(error)
-//     // const originalRequest = error.config as RetryableRequestConfig | undefined;
-//     // if (!originalRequest || error.response?.status !== 401 || originalRequest._retry) {
-//     //     return Promise.reject(error);
-//     // }
-//     // const refreshResponse = await api.post<LoginResponse>("/auth/refresh");
-//     // console.log("REFRESH RESPONSE", refreshResponse)
-//     // if ((originalRequest.url ?? "").includes("/auth/refresh")) {
-//     //     setAxiosAccessToken(null);
-//     //     console.log('you logged out')
-//     //     return Promise.reject(error);
-//     // }
+api.interceptors.response.use(response => response, async (error: AxiosError) => {
+    const originalRequest = error.config as AxiosRequestConfig & { _retry: boolean }
 
-//     // originalRequest._retry = true;
+    if (error.response?.status !== 401 || accessToken === null) {
+        return Promise.reject(error);
+    }
 
-//     // try {
-//     //     console.log('refreshing on client')
-//     //     const refreshResponse = await api.post<LoginResponse>("/auth/refresh");
+    if (originalRequest.url?.includes("/auth/refresh")) {
+        axiosLogoutFn();
+        accessToken = null;
+        return Promise.reject(error);
+    }
 
-//     //     if (refreshResponse.data.success) {
-//     //         const newAccessToken = refreshResponse.data.data?.accessToken;
-//     //         setAxiosAccessToken(newAccessToken);
-//     //     }
+    if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+        })
+            .then(token => {
+                withAuthorizationHeader(originalRequest.headers, token as string)
+                return api(originalRequest);
+            })
+            .catch(err => Promise.reject(err));
+    }
 
-//     //     return api(originalRequest);
-//     // } catch (refreshError) {
-//     //     // اگه رفرش هم ارور داد، دیگه تمومه → لاگ‌اوت
-//     //     setAxiosAccessToken(null);
-//     //     console.log("refresh failed → logout");
-//     //     return Promise.reject(refreshError);
-//     // }
+    originalRequest._retry = true;
+    isRefreshing = true;
 
-// })
+    try {
+        const res = await authApi.refresh();
+        console.log("refreshing")
+
+        const newAccess = res.data.data.accessToken;
+
+        accessToken = newAccess;
+
+        api.defaults.headers.Authorization = `Bearer ${newAccess}`;
+
+        processQueue(null, newAccess);
+
+        withAuthorizationHeader(originalRequest.headers, accessToken)
+        return api(originalRequest);
+
+    } catch (err) {
+        processQueue(err, null);
+        accessToken = null;
+        axiosLogoutFn()
+        return Promise.reject(err);
+    } finally {
+        isRefreshing = false;
+    }
+})
