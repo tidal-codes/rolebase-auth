@@ -11,7 +11,13 @@ import {
   unlikePost,
   updatePost
 } from './posts.service.js';
-import { createPostSchema, postIdParamSchema, updatePostSchema } from './posts.schema.js';
+import {
+  createPostSchema,
+  postIdParamSchema,
+  toggleBookmarkSchema,
+  toggleLikeSchema,
+  updatePostSchema
+} from './posts.schema.js';
 
 function getAuthenticatedUserId(req: Request): string {
   if (!req.auth?.userId) {
@@ -55,33 +61,31 @@ export async function listPostsHandler(req: Request, res: Response) {
 export async function likePostHandler(req: Request, res: Response) {
   const userId = getAuthenticatedUserId(req);
   const { postId } = postIdParamSchema.parse(req.params);
-  const like = await likePost(userId, postId);
+  const payload = toggleLikeSchema.parse(req.body);
 
-  res.status(201).json({ success: true, data: like });
-}
+  if (payload.liked) {
+    const like = await likePost(userId, postId);
+    res.status(200).json({ success: true, data: { liked: true, record: like } });
+    return;
+  }
 
-export async function unlikePostHandler(req: Request, res: Response) {
-  const userId = getAuthenticatedUserId(req);
-  const { postId } = postIdParamSchema.parse(req.params);
   await unlikePost(userId, postId);
-
-  res.status(200).json({ success: true, data: { removed: true } });
+  res.status(200).json({ success: true, data: { liked: false } });
 }
 
 export async function bookmarkPostHandler(req: Request, res: Response) {
   const userId = getAuthenticatedUserId(req);
   const { postId } = postIdParamSchema.parse(req.params);
-  const bookmark = await bookmarkPost(userId, postId);
+  const payload = toggleBookmarkSchema.parse(req.body);
 
-  res.status(201).json({ success: true, data: bookmark });
-}
+  if (payload.saved) {
+    const bookmark = await bookmarkPost(userId, postId);
+    res.status(200).json({ success: true, data: { saved: true, record: bookmark } });
+    return;
+  }
 
-export async function removeBookmarkHandler(req: Request, res: Response) {
-  const userId = getAuthenticatedUserId(req);
-  const { postId } = postIdParamSchema.parse(req.params);
   await removeBookmark(userId, postId);
-
-  res.status(200).json({ success: true, data: { removed: true } });
+  res.status(200).json({ success: true, data: { saved: false } });
 }
 
 export async function listLikesHandler(req: Request, res: Response) {
