@@ -26,13 +26,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         (async function checkUser() {
             try {
-                const { data } = await authApi.refresh();
+                const data = await authApi.refresh();
                 setAuth({
-                    user: data.data.user,
-                    accessToken: data.data.accessToken
+                    user: data?.data.data.user ?? null,
+                    accessToken: data?.data.data.accessToken ?? null
                 })
-            } catch (e) {
-                console.log(e)
             } finally {
                 setLoading(false);
             }

@@ -30,34 +30,35 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 })
 
 api.interceptors.response.use((response) => response, async (error: AxiosError) => {
-    const originalRequest = error.config as RetryableRequestConfig | undefined;
-    if (!originalRequest || error.response?.status !== 401 || originalRequest._retry) {
-        return Promise.reject(error);
-    }
+    // const originalRequest = error.config as RetryableRequestConfig | undefined;
+    // if (!originalRequest || error.response?.status !== 401 || originalRequest._retry) {
+    //     return Promise.reject(error);
+    // }
+    // const refreshResponse = await api.post<LoginResponse>("/auth/refresh");
+    // console.log("REFRESH RESPONSE", refreshResponse)
+    // if ((originalRequest.url ?? "").includes("/auth/refresh")) {
+    //     setAxiosAccessToken(null);
+    //     console.log('you logged out')
+    //     return Promise.reject(error);
+    // }
 
-    if ((originalRequest.url ?? "").includes("/auth/refresh")) {
-        setAxiosAccessToken(null);
-        console.log('you logged out')
-        return Promise.reject(error);
-    }
+    // originalRequest._retry = true;
 
-    originalRequest._retry = true;
+    // try {
+    //     console.log('refreshing on client')
+    //     const refreshResponse = await api.post<LoginResponse>("/auth/refresh");
 
-    try {
-        console.log('refreshing on client')
-        const refreshResponse = await api.post<LoginResponse>("/auth/refresh");
+    //     if (refreshResponse.data.success) {
+    //         const newAccessToken = refreshResponse.data.data?.accessToken;
+    //         setAxiosAccessToken(newAccessToken);
+    //     }
 
-        if (refreshResponse.data.success) {
-            const newAccessToken = refreshResponse.data.data?.accessToken;
-            setAxiosAccessToken(newAccessToken);
-        }
-
-        return api(originalRequest);
-    } catch (refreshError) {
-        // اگه رفرش هم ارور داد، دیگه تمومه → لاگ‌اوت
-        setAxiosAccessToken(null);
-        console.log("refresh failed → logout");
-        return Promise.reject(refreshError);
-    }
+    //     return api(originalRequest);
+    // } catch (refreshError) {
+    //     // اگه رفرش هم ارور داد، دیگه تمومه → لاگ‌اوت
+    //     setAxiosAccessToken(null);
+    //     console.log("refresh failed → logout");
+    //     return Promise.reject(refreshError);
+    // }
 
 })
