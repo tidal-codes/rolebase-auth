@@ -9,8 +9,6 @@ import {
   listBookmarksHandler,
   listLikesHandler,
   listPostsHandler,
-  removeBookmarkHandler,
-  unlikePostHandler,
   updatePostHandler
 } from './posts.controller.js';
 
@@ -23,8 +21,6 @@ postsRouter.post('/', asyncHandler(createPostHandler));
 postsRouter.put('/:postId', asyncHandler(updatePostHandler));
 postsRouter.delete('/:postId', asyncHandler(deletePostHandler));
 postsRouter.post('/:postId/likes', asyncHandler(likePostHandler));
-postsRouter.delete('/:postId/likes', asyncHandler(unlikePostHandler));
 postsRouter.post('/:postId/bookmarks', asyncHandler(bookmarkPostHandler));
-postsRouter.delete('/:postId/bookmarks', asyncHandler(removeBookmarkHandler));
 postsRouter.get('/likes', asyncHandler(listLikesHandler));
 postsRouter.get('/bookmarks', asyncHandler(listBookmarksHandler));

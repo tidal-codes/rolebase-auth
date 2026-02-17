@@ -13,3 +13,11 @@ export const updatePostSchema = z.object({
 export const postIdParamSchema = z.object({
   postId: z.string().uuid()
 });
+
+export const toggleLikeSchema = z.object({
+  liked: z.boolean()
+});
+
+export const toggleBookmarkSchema = z.object({
+  saved: z.boolean()
+});
