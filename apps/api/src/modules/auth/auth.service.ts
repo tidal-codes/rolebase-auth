@@ -307,20 +307,29 @@ export async function refresh(currentRefreshToken: string): Promise<AuthResult> 
 }
 
 export async function logout(currentRefreshToken: string): Promise<void> {
-  const { payload } = await verifyRefreshToken(currentRefreshToken);
-  const sid = payload.sid;
-  const sub = payload.sub;
+  try {
+    const { payload } = await verifyRefreshToken(currentRefreshToken);
+    const sid = payload.sid;
+    const sub = payload.sub;
 
-  if (!sid || !sub || typeof sid !== 'string' || typeof sub !== 'string') {
-    return;
+    if (!sid || !sub || typeof sid !== 'string' || typeof sub !== 'string') {
+      return;
+    }
+
+    const { error } = await supabaseAdminClient
+      .from('auth_sessions')
+      .update({ revoked_at: new Date().toISOString() })
+      .eq('id', sid)
+      .eq('user_id', sub)
+      .is('revoked_at', null);
+
+    if (error) {
+      console.warn(`Logout session revoke skipped: ${error.message}`);
+    }
+  } catch {
+    // Logout must be idempotent and user-friendly.
+    // If the refresh token is expired/invalid, treat it as already logged out.
   }
-
-  await supabaseAdminClient
-    .from('auth_sessions')
-    .update({ revoked_at: new Date().toISOString() })
-    .eq('id', sid)
-    .eq('user_id', sub)
-    .is('revoked_at', null);
 }
 
 export async function getCurrentUser(userId: string): Promise<ProfileUser> {
