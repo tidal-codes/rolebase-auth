@@ -7,5 +7,11 @@ export const postApi = {
     },
     getPosts: () => {
         return api.get<GetPostsResponse>("posts")
+    },
+    like: (body: { liked: boolean, postId: string }) => {
+        return api.post(`posts/${body.postId}/likes`, body)
+    },
+    bookmark : (body : {saved : boolean , postId : string}) => {
+        return api.post(`posts/${body.postId}/bookmarks`, body)
     }
 }

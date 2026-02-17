@@ -11,7 +11,7 @@ interface PostCardProps {
 
 const PostCard = ({ postId }: PostCardProps) => {
     const postsById = usePostStore(state => state.postsById);
-    const { title, body, author: { full_name } } = postsById[postId];
+    const { title, body, liked, saved, author: { full_name } } = postsById[postId];
     return (
         <Box
             p="1"
@@ -51,7 +51,11 @@ const PostCard = ({ postId }: PostCardProps) => {
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Actions />
+                    <Actions
+                        postId={postId}
+                        liked={liked}
+                        saved={saved}
+                    />
                     <Box>
                         <Avatar name={full_name} size="sm" />
                     </Box>

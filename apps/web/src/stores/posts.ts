@@ -17,13 +17,19 @@ export const usePostStore = create<PostStore>((set) => ({
             }
         })),
 
-    updatePost: (post) =>
-        set((state) => ({
-            postsById: {
-                ...state.postsById,
-                [post.id]: post
+    updatePost: (postId, postParams) =>
+        set((state) => {
+            const { [postId]: post, ...rest } = state.postsById;
+            return {
+                postsById: {
+                    ...rest,
+                    [postId]: {
+                        ...post,
+                        ...postParams
+                    }
+                }
             }
-        })),
+        }),
 
     removePost: (postId) =>
         set((state) => {

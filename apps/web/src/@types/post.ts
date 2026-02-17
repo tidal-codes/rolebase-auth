@@ -29,7 +29,7 @@ export interface PostStore {
     postsById: Record<string, Post>;
 
     addPost: (post: Post) => void;
-    updatePost: (post: Post) => void;
+    updatePost: (postId: string, postParams: Partial<Post>) => void;
     removePost: (postId: string) => void;
 
     setPostLiked: (id: string, liked: boolean) => void;

@@ -3,6 +3,7 @@ import { postApi } from "../../api/post";
 import { usePostStore } from "../../stores/posts";
 import type { Post } from "../../@types/post";
 import useAuth from "../auth/useAuth";
+import { toast } from "../../utils/toaster";
 
 export function usePosts() {
     const { data, isLoading } = useQuery({
@@ -50,6 +51,7 @@ export function useAddPost() {
 
         onError: (_error, _variables, context) => {
             if (context?.tempId) removePost(context.tempId);
+            toast.error(_error.message);
         },
 
         onSuccess: (data, _variables, context) => {
@@ -62,4 +64,41 @@ export function useAddPost() {
         add: mutation.mutate,
         isPending: mutation.isPending,
     };
+}
+
+export function useLike() {
+    const updatePost = usePostStore(state => state.updatePost);
+    const mutation = useMutation({
+        mutationFn: ({ postId, liked }: { postId: string, liked: boolean }) => postApi.like({ postId, liked }),
+        onMutate: ({ postId, liked }) => {
+            updatePost(postId, { liked })
+        },
+        onError: (error, variables) => {
+            updatePost(variables.postId, { liked: !variables.liked })
+            toast.error(error.message)
+        },
+
+    })
+
+    return {
+        like: mutation.mutate,
+    }
+}
+export function useBookmark() {
+    const updatePost = usePostStore(state => state.updatePost);
+    const mutation = useMutation({
+        mutationFn: ({ postId, saved }: { postId: string, saved: boolean }) => postApi.bookmark({ postId, saved }),
+        onMutate: ({ postId, saved }) => {
+            updatePost(postId, { saved })
+        },
+        onError: (error, variables) => {
+            updatePost(variables.postId, { saved: !variables.saved })
+            toast.error(error.message)
+        },
+
+    })
+
+    return {
+        save: mutation.mutate,
+    }
 }
