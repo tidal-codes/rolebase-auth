@@ -72,7 +72,6 @@ api.interceptors.response.use(response => response, async (error: AxiosError) =>
 
     try {
         const res = await authApi.refresh();
-        console.log("refreshing")
 
         const newAccess = res.data.data.accessToken;
 
