@@ -67,7 +67,11 @@ const PostCard = ({ postId }: PostCardProps) => {
                 gap="1"
                 backgroundColor="white"
             >
-                <Flex alignItems="center" justifyContent="space-between">
+                <Flex
+                    alignItems="center"
+                    justifyContent="space-between"
+                    h="35px"
+                >
                     <Text fontSize="lg" truncate>{title}</Text>
                     <ActionsMenu postId={postId} />
                 </Flex>

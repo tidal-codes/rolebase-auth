@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { usePostStore } from "../../stores/posts";
 import { useSearchStore } from "../../stores/search";
 import type { PostView } from "../../@types/post";

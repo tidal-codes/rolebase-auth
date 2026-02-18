@@ -5,7 +5,7 @@ import FieldPinInput from "../ui/fieldPinInput";
 import useVerifyCodeStage from "../../hooks/auth/useVerifyCodeStage";
 import { useEffect, type Dispatch, type SetStateAction } from "react";
 import { getAvailableEmailConfirmation, removeAvailableEmailConfirmation } from "../../utils/emailConfirmationStorage";
-import List from "../ui/List";
+import List from "../ui/list";
 import type { AuthStage } from "../../@types/auth";
 
 interface VerificationCodeFormProps {

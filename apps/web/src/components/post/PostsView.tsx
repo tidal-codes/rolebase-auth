@@ -1,4 +1,4 @@
-import { Box, Flex, For, Grid, Text } from '@chakra-ui/react';
+import { Box, Flex, For, Grid, Spinner, Text } from '@chakra-ui/react';
 import { usePosts } from '../../hooks/post/queries';
 import { usePostViewStore } from '../../stores/posts';
 import SegmentGroup from '../ui/segmentGroup';
@@ -48,15 +48,23 @@ const PostsView = () => {
                         alignItems="center"
                         justifyContent="center"
                     >
-                        <Text>loading data ...</Text>
+                        <Flex
+                            flexDir="column"
+                            gap="1"
+                            alignItems="center"
+                        >
+                            <Spinner size="sm" />
+                            <Text>loading data ...</Text>
+                        </Flex>
                     </Flex>
                 ) : (
                     filteredPosts.length ? (
                         <Grid
                             templateColumns={{
-                                base: "repeat(1, minmax(0, 1fr))",
-                                md: "repeat(3, minmax(0, 1fr))",
-                                xl: "repeat(4, minmax(0, 1fr))",
+                                base: "1fr",
+                                sm: "repeat(2, 1fr)",
+                                lg: "repeat(3, 1fr)",
+                                "2xl": "repeat(4, 1fr)",
                             }}
                             gap={3}
                         >
