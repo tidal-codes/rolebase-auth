@@ -41,7 +41,7 @@ export function useAddPost() {
                 pending: true,
                 author: {
                     id: user!.id,
-                    full_name: user!.email
+                    full_name: user!.fullName
                 }
             };
 

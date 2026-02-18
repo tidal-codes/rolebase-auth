@@ -6,6 +6,7 @@ import { useState } from 'react';
 import MenuItem from '../../ui/menuItem';
 import { useDeletePost } from '../../../hooks/post/queries';
 import usePostDialog from '../../../hooks/post/usePostDialog';
+import useAuth from '../../../hooks/auth/useAuth';
 
 interface ActionsMenuProps {
     postId: string
@@ -13,14 +14,18 @@ interface ActionsMenuProps {
 
 const ActionsMenu = ({ postId }: ActionsMenuProps) => {
     const pending = usePostStore(state => state.postsById[postId]?.pending ?? false);
+    const authorId = usePostStore(state => state.postsById[postId].author.id);
     const { handleOpen } = usePostDialog();
     const { deletePost } = useDeletePost(postId);
     const [open, setOpen] = useState(false);
+    const { user } = useAuth();
 
     const handleDeletePost = () => {
         setOpen(false);
         deletePost();
     };
+
+    if (authorId !== user?.id) return null;
 
     return (
         <>
@@ -28,7 +33,7 @@ const ActionsMenu = ({ postId }: ActionsMenuProps) => {
             {
                 pending ? (
                     <Button variant="ghost" size="small-icon">
-                        <Spinner size="sm"/>
+                        <Spinner size="sm" />
                     </Button>
 
                 ) : (

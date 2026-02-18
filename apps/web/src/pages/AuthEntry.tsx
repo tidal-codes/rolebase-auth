@@ -1,11 +1,11 @@
 import { Box } from "@chakra-ui/react";
-import AuthWrapper from "../auth/AuthWrapper";
-import LoginForm from "../auth/LoginForm";
+import AuthWrapper from "../components/auth/AuthWrapper";
+import LoginForm from "../components/auth/LoginForm";
 import { useState } from "react";
-import RegisterForm from "../auth/RegisterForm";
-import VerificationCodeForm from "../auth/VerificationCodeForm";
-import StageBack from "../auth/StageBack";
-import useStage from "../../hooks/auth/useStage";
+import RegisterForm from "../components/auth/RegisterForm";
+import VerificationCodeForm from "../components/auth/VerificationCodeForm";
+import StageBack from "../components/auth/StageBack";
+import useStage from "../hooks/auth/useStage";
 
 const AuthEntry = () => {
     const { stage, setStage } = useStage();
@@ -17,6 +17,9 @@ const AuthEntry = () => {
             <Box
                 w="full"
                 maxW="sm"
+                px={{
+                    mdDown: "5"
+                }}
             >
                 {stage === "LOGIN" && (
                     <LoginForm

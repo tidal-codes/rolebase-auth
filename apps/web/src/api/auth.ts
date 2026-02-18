@@ -18,7 +18,7 @@ export const authApi = {
         return api.post("auth/register", body)
     },
     verifyEmail: (body: { email: string, token: string }) => {
-        return api.post("auth/verify-email", body)
+        return api.post<LoginResponse>("auth/verify-email", body)
     },
     resendConfirmationCode: (body: { email: string }) => {
         return api.post("auth/resend-confirmation", body)

@@ -5,7 +5,6 @@ import FieldPinInput from "../ui/fieldPinInput";
 import useVerifyCodeStage from "../../hooks/auth/useVerifyCodeStage";
 import { useEffect, type Dispatch, type SetStateAction } from "react";
 import { getAvailableEmailConfirmation, removeAvailableEmailConfirmation } from "../../utils/emailConfirmationStorage";
-import { Pen } from "lucide-react";
 import List from "../ui/List";
 import type { AuthStage } from "../../@types/auth";
 
@@ -29,7 +28,7 @@ const VerificationCodeForm = ({ setStage, email }: VerificationCodeFormProps) =>
                 <Text fontSize="xl">
                     Verification Code
                 </Text>
-                <Flex alignItems="center" gap="3">
+                <Flex alignItems="center" gap="3" smDown={{ flexDir: "column" , alignItems : "flex-start" }}>
                     <Text color="fg.info" fontSize="xl">{_email}</Text>
                     <Button
                         variant="subtle"

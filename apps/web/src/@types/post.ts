@@ -1,11 +1,18 @@
 import type { z } from "zod"
 import type { postSchema } from "../hooks/post/forms"
+import type { Dispatch, SetStateAction } from "react";
 
 export interface PostDialogContextType {
     open: boolean,
     defaultPostId: string | null,
     handleOpen: (open: boolean, defaultPostId?: string) => void,
     toggleOpen: () => void
+}
+export interface PostViewDialogContextType {
+    open: boolean,
+    setOpen: Dispatch<SetStateAction<boolean>>;
+    postId: string | null;
+    handleOpenPost: (postId: string) => void
 }
 export type PostForm = z.infer<typeof postSchema>;
 

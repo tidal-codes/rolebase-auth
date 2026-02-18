@@ -33,7 +33,7 @@ const FieldPinInput = ({ length, errors, control }: FieldPinInputProps) => {
 
                         >
                             <PinInput.HiddenInput />
-                            <PinInput.Control>
+                            <PinInput.Control gap="0.5">
                                 {
                                     Array.from({ length }).map((_, i) => {
                                         return (

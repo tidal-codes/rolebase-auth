@@ -14,6 +14,7 @@ const PatternBackground = ({ children }: { children: ReactNode }) => {
                 bgGradient="radial-gradient(circle, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,1) 100%)"
                 alignItems="center"
                 justifyContent="center"
+                overflowY="auto"
             >
                 {children}
             </Flex>

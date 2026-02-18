@@ -29,8 +29,13 @@ export default function SearchedSection() {
                                 }
                             }}
                             exit={{ opacity: 0 }}
+                            smDown={{
+                                flexDir: "column",
+                                alignItems: "flex-start"
+                            }}
+                            minW="0"
                         >
-                            <MotionFlex alignItems="center" gap="1">
+                            <MotionFlex alignItems="center" gap="2">
                                 <MotionText
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{
@@ -44,8 +49,10 @@ export default function SearchedSection() {
                                         transition: { duration: 0.2 }
                                     }}
                                     fontSize="xl"
+                                    flexWrap="nowrap"
+                                    whiteSpace="nowrap"
                                 >
-                                    search result for:
+                                    Search results for:
                                 </MotionText>
 
                                 <MotionText
@@ -62,6 +69,8 @@ export default function SearchedSection() {
                                     }}
                                     fontSize="2xl"
                                     fontWeight="medium"
+                                    minW="0"
+                                    truncate
                                 >
                                     {search}
                                 </MotionText>
@@ -80,7 +89,7 @@ export default function SearchedSection() {
                                     transition: { duration: 0.2 }
                                 }}
                             >
-                                {`${searchResultCount} result found`}
+                                {`${searchResultCount} results found`}
                             </MotionText>
                         </MotionFlex>
                     )}

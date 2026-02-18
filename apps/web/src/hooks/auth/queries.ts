@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { authApi } from "../../api/auth";
 import type { RegisterForm, RemainingSessionResponse } from "../../@types/auth";
+import { useNavigate } from "react-router";
+import { toast } from "../../utils/toaster";
 
 export function useCheckForEmailAccount() {
     const mutation = useMutation({
@@ -50,11 +52,25 @@ export function useVerifyCode() {
 }
 
 export function useLogout() {
+    const navigate = useNavigate();
     const mutation = useMutation({
-        mutationFn: () => authApi.logout()
+        mutationFn: () => authApi.logout(),
+        onError: (error) => {
+            toast.error(error.message)
+        }
     })
+
+    async function handleLogout() {
+        try {
+            await mutation.mutateAsync();
+            navigate("/auth")
+        } catch (e) {
+            toast.error("unknown error while trying to logout")
+        }
+    }
+
     return {
-        logout: mutation.mutateAsync,
+        handleLogout,
         isPending: mutation.isPending,
         error: mutation.error
     }

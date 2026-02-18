@@ -9,6 +9,7 @@ const HomeHeader = () => {
             w="full"
             justifyContent="space-between"
             alignItems="center"
+            gap="3"
         >
             <SessionControl />
             <SearchPosts />

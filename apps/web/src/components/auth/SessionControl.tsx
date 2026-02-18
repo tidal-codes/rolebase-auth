@@ -1,6 +1,5 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import { useLogout } from '../../hooks/auth/queries';
-import { useNavigate } from 'react-router';
 import Avatar from '../ui/avatar';
 import Menu from '../ui/menu';
 import MenuItem from '../ui/menuItem';
@@ -9,19 +8,9 @@ import { useState } from 'react';
 import useAuth from '../../hooks/auth/useAuth';
 
 const SessionControl = () => {
-    const { logout, isPending } = useLogout();
+    const { handleLogout } = useLogout();
     const [openMenu, setOpenMenu] = useState(false);
     const { user } = useAuth();
-    const navigate = useNavigate();
-
-    async function handleLogout() {
-        try {
-            await logout();
-            navigate("/auth")
-        } catch (e) {
-            console.log(e)
-        }
-    }
 
     return (
         <Menu
@@ -32,7 +21,10 @@ const SessionControl = () => {
                     variant="outline"
                     backgroundColor="white"
                     rounded="full"
-                    minW="105px"
+                    minW={{
+                        mdDown : "auto",
+                        lg : "105px"
+                    }}
                     justifyContent="flex-start"
                     px="1"
                     gap="0"
@@ -44,6 +36,7 @@ const SessionControl = () => {
                         flex="1"
                         mx="auto"
                         px="2"
+                        hideBelow="md"
                     >
                         <Text>{user?.email}</Text>
                     </Box>

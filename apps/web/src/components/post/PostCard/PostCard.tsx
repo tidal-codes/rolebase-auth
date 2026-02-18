@@ -5,6 +5,7 @@ import { Flex, Text, Box } from "@chakra-ui/react";
 import ActionsMenu from "./ActionsMenu";
 import { useLayoutEffect, useState } from "react";
 import React from "react";
+import usePostViewDialog from "../../../hooks/post/usePostViewDialog";
 
 interface PostCardProps {
     postId: string
@@ -18,6 +19,7 @@ const PostCard = ({ postId }: PostCardProps) => {
     const title = usePostStore(state => state.postsById[postId]?.title);
     const authorName = usePostStore(state => state.postsById[postId]?.author.full_name);
     const [colorPalette, setColorPalette] = useState<string | undefined>(undefined);
+    const { handleOpenPost } = usePostViewDialog();
 
     useLayoutEffect(() => {
         const index = authorName.charCodeAt(0) % colorPaletteArray.length;
@@ -47,6 +49,16 @@ const PostCard = ({ postId }: PostCardProps) => {
             }}
             position="relative"
         >
+            <Box
+                position="absolute"
+                inset="0"
+                tabIndex={0}
+                cursor="pointer"
+                onClick={() => handleOpenPost(postId)}
+
+            >
+
+            </Box>
             <Flex
                 w="full"
                 rounded="sm"

@@ -1,7 +1,7 @@
-import { Dialog as BaseDialog, Portal } from "@chakra-ui/react"
+import { Dialog as BaseDialog, Portal, type DialogRootProps } from "@chakra-ui/react"
 import { type ReactNode } from "react"
 
-interface DialogProps {
+interface DialogProps extends DialogRootProps {
     trigger?: ReactNode
     open: boolean,
     setOpen: (open: boolean) => void
@@ -9,7 +9,7 @@ interface DialogProps {
 
 }
 
-const Dialog = ({ trigger, open, setOpen, children }: DialogProps) => {
+const Dialog = ({ trigger, open, setOpen, children, ...rest }: DialogProps) => {
     return (
         <BaseDialog.Root
             lazyMount
@@ -17,6 +17,7 @@ const Dialog = ({ trigger, open, setOpen, children }: DialogProps) => {
             onOpenChange={(e) => setOpen(e.open)}
             placement={"center"}
             size="lg"
+            {...rest}
         >
             {trigger && (
                 <BaseDialog.Trigger asChild>
@@ -24,7 +25,7 @@ const Dialog = ({ trigger, open, setOpen, children }: DialogProps) => {
                 </BaseDialog.Trigger>
             )}
             <Portal>
-                <BaseDialog.Positioner bgColor="blackAlpha.200">
+                <BaseDialog.Positioner bgColor="blackAlpha.200" px="2">
                     <BaseDialog.Content rounded="xl">
                         {children}
                     </BaseDialog.Content>

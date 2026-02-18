@@ -1,4 +1,4 @@
-import AuthEntry from './components/pages/AuthEntry';
+import AuthEntry from './pages/AuthEntry';
 
 const App = () => {
     return <AuthEntry />;

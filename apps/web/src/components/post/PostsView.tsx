@@ -76,7 +76,7 @@ const PostsView = () => {
                             alignItems="center"
                             justifyContent="center"
                         >
-                            <Text>NO ITEMS WERE FOUND</Text>
+                            <Text>No items found.</Text>
                         </Flex>
                     )
                 )
