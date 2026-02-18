@@ -5,14 +5,19 @@ import SegmentGroup from '../ui/segmentGroup';
 import type { PostView } from '../../@types/post';
 import PostCard from './PostCard';
 import useFilteredPosts from '../../hooks/post/useFilteredPosts';
-import { useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 const PostsView = () => {
     const { isLoading } = usePosts();
     const setView = usePostViewStore(state => state.setView);
-    const [_isPending, startTransition] = useTransition();
+    const [, startTransition] = useTransition();
     const view = usePostViewStore(state => state.view);
+    const [segmentValue, setSegmentValue] = useState<PostView>(view);
     const filteredPosts = useFilteredPosts(view);
+
+    useEffect(() => {
+        setSegmentValue(view);
+    }, [view]);
 
     return (
         <Flex
@@ -24,10 +29,12 @@ const PostsView = () => {
         >
             <Box>
                 <SegmentGroup
-                    value={view}
+                    value={segmentValue}
                     setValue={(value) => {
+                        const nextView = value as PostView;
+                        setSegmentValue(nextView);
                         startTransition(() => {
-                            setView(value as PostView)
+                            setView(nextView)
                         })
                     }}
                     items={["All", "Liked", "Saved"] as PostView[]}

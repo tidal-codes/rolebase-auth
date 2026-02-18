@@ -9,9 +9,9 @@ interface ActionsProps {
 
 const ThumbsUpIcon = chakra(ThumbsUp);
 
-const Actions = ({ postId}: ActionsProps) => {
-    const liked = usePostStore(state => state.postsById[postId].liked);
-    const saved = usePostStore(state => state.postsById[postId].saved);
+const Actions = ({ postId }: ActionsProps) => {
+    const liked = usePostStore(state => state.postsById[postId]?.liked ?? false);
+    const saved = usePostStore(state => state.postsById[postId]?.saved ?? false);
     const { like } = useLike();
     const { save } = useBookmark();
     return (
@@ -33,7 +33,7 @@ const Actions = ({ postId}: ActionsProps) => {
                 onClick={() => save({ saved: !saved, postId })}
             >
                 {saved ? (
-                    <Bookmark fill="black"/>
+                    <Bookmark fill="black" />
                 ) : (
                     <Bookmark />
                 )}

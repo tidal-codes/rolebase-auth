@@ -6,6 +6,15 @@ export const usePostStore = create<PostStore>((set) => ({
     postIds: [],
     postsById: {},
 
+    setPosts: (posts) =>
+        set(() => ({
+            postIds: posts.map((post) => post.id),
+            postsById: posts.reduce<PostStore["postsById"]>((acc, post) => {
+                acc[post.id] = post;
+                return acc;
+            }, {})
+        })),
+
     addPost: (post) =>
         set((state) => ({
             postIds: state.postIds.includes(post.id)
@@ -19,12 +28,13 @@ export const usePostStore = create<PostStore>((set) => ({
 
     updatePost: (postId, postParams) =>
         set((state) => {
-            const { [postId]: post, ...rest } = state.postsById;
+            const currentPost = state.postsById[postId];
+            if (!currentPost) return state;
             return {
                 postsById: {
-                    ...rest,
+                    ...state.postsById,
                     [postId]: {
-                        ...post,
+                        ...currentPost,
                         ...postParams
                     }
                 }
@@ -34,6 +44,7 @@ export const usePostStore = create<PostStore>((set) => ({
     removePost: (postId) =>
         set((state) => {
             const { [postId]: removed, ...rest } = state.postsById;
+            if (!removed) return state;
             return {
                 postIds: state.postIds.filter(id => id !== postId),
                 postsById: rest

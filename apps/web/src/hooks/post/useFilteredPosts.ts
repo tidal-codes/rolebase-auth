@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePostStore } from "../../stores/posts";
 import { useSearchStore } from "../../stores/search";
 import type { PostView } from "../../@types/post";
 
 export default function useFilteredPosts(view: PostView) {
-    const { search, setSearchResultCount } = useSearchStore();
+    const search = useSearchStore(state => state.search);
+    const setSearchResultCount = useSearchStore(state => state.setSearchResultCount);
     const postIds = usePostStore(state => state.postIds);
     const postsById = usePostStore(state => state.postsById);
-    const [filteredPosts, setFilteredPosts] = useState<string[]>([]);
 
 
-    useEffect(() => {
+    const filteredPosts = useMemo(() => {
         const filteredByView = postIds.filter(id => {
             const post = postsById[id];
             if (!post) return false;
@@ -21,21 +21,17 @@ export default function useFilteredPosts(view: PostView) {
         });
 
         const query = search.trim().toLowerCase();
-        if (!query) {
-            setFilteredPosts(filteredByView);
-            return;
-        }
-        const filteredPostIds = query
-            ? filteredByView.filter(id => postsById[id]?.title.toLowerCase().includes(query))
-            : filteredByView;
 
-        setFilteredPosts(filteredPostIds);
+        if (!query) return filteredByView;
+        return filteredByView.filter(id => postsById[id]?.title.toLowerCase().includes(query));
     }, [view, search, postIds, postsById]);
+
+
 
 
     useEffect(() => {
         setSearchResultCount(filteredPosts.length)
-    }, [filteredPosts])
+    }, [filteredPosts.length, setSearchResultCount])
 
     return filteredPosts;
 }

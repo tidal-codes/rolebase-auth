@@ -28,7 +28,7 @@ export interface Post {
 export interface PostStore {
     postIds: string[];
     postsById: Record<string, Post>;
-
+    setPosts: (posts: Post[]) => void;
     addPost: (post: Post) => void;
     updatePost: (postId: string, postParams: Partial<Post>) => void;
     removePost: (postId: string) => void;

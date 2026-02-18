@@ -12,17 +12,23 @@ interface ActionsMenuProps {
 }
 
 const ActionsMenu = ({ postId }: ActionsMenuProps) => {
-    const pending = usePostStore(state => state.postsById[postId].pending);
+    const pending = usePostStore(state => state.postsById[postId]?.pending ?? false);
     const { handleOpen } = usePostDialog();
     const { deletePost } = useDeletePost(postId);
     const [open, setOpen] = useState(false);
+
+    const handleDeletePost = () => {
+        setOpen(false);
+        deletePost();
+    };
+
     return (
         <>
 
             {
                 pending ? (
                     <Button variant="ghost" size="small-icon">
-                        <Spinner />
+                        <Spinner size="sm"/>
                     </Button>
 
                 ) : (
@@ -44,7 +50,7 @@ const ActionsMenu = ({ postId }: ActionsMenuProps) => {
                         </MenuItem>
                         <MenuItem
                             value='delete-post'
-                            onClick={() => deletePost()}
+                            onClick={handleDeletePost}
                             color="fg.error"
                             _hover={{
                                 bgColor: "bg.error"

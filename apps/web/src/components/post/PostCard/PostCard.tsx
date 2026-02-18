@@ -17,7 +17,6 @@ const PostCard = ({ postId }: PostCardProps) => {
     const body = usePostStore(state => state.postsById[postId]?.body);
     const title = usePostStore(state => state.postsById[postId]?.title);
     const authorName = usePostStore(state => state.postsById[postId]?.author.full_name);
-    if (!body || !title || !authorName) return null;
     const [colorPalette, setColorPalette] = useState<string | undefined>(undefined);
 
     useLayoutEffect(() => {
@@ -25,7 +24,8 @@ const PostCard = ({ postId }: PostCardProps) => {
         setColorPalette(colorPaletteArray[index])
     }, [authorName, setColorPalette])
 
-    console.log("re render");
+    if (!body || !title || !authorName) return null;
+
 
     return (
         <Box
