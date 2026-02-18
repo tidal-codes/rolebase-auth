@@ -1,16 +1,17 @@
 import { Box, Button, chakra } from '@chakra-ui/react';
 import { Bookmark, ThumbsUp } from 'lucide-react';
 import { useBookmark, useLike } from '../../../hooks/post/queries';
+import { usePostStore } from '../../../stores/posts';
 
 interface ActionsProps {
     postId: string
-    liked: boolean
-    saved: boolean
 }
 
 const ThumbsUpIcon = chakra(ThumbsUp);
 
-const Actions = ({ postId, liked, saved }: ActionsProps) => {
+const Actions = ({ postId}: ActionsProps) => {
+    const liked = usePostStore(state => state.postsById[postId].liked);
+    const saved = usePostStore(state => state.postsById[postId].saved);
     const { like } = useLike();
     const { save } = useBookmark();
     return (

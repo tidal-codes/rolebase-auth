@@ -1,4 +1,4 @@
-import type { GetPostResponse, GetPostsResponse } from "../@types/post"
+import type { GetPostResponse, GetPostsResponse, Post } from "../@types/post"
 import { api } from "../libs/client"
 
 export const postApi = {
@@ -11,7 +11,13 @@ export const postApi = {
     like: (body: { liked: boolean, postId: string }) => {
         return api.post(`posts/${body.postId}/likes`, body)
     },
-    bookmark : (body : {saved : boolean , postId : string}) => {
+    bookmark: (body: { saved: boolean, postId: string }) => {
         return api.post(`posts/${body.postId}/bookmarks`, body)
+    },
+    delete: ({ postId }: { postId: string }) => {
+        return api.delete(`posts/${postId}`)
+    },
+    update: (body: { id: string, title: string, body: string }) => {
+        return api.put(`posts/${body.id}`, body);
     }
 }

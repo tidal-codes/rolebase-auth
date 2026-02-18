@@ -1,15 +1,25 @@
-import { Menu } from '@chakra-ui/react';
+import { Menu, type MenuItemProps } from '@chakra-ui/react';
 import type { ReactNode } from 'react';
 
-interface MenuItemProps {
+interface MenuItemPropsType extends MenuItemProps{
     value: string,
     children: ReactNode,
-    onClick: () => void
+    onClick: () => void,
 }
 
-const MenuItem = ({ value, onClick, children }: MenuItemProps) => {
+const MenuItem = ({ value, onClick, children, ...rest }: MenuItemPropsType) => {
     return (
-        <Menu.Item value={value} onClick={onClick}>{children}</Menu.Item>
+        <Menu.Item
+            _icon={{
+                w: "4",
+                h: "4"
+            }}
+            value={value}
+            onClick={onClick}
+            {...rest}
+        >
+            {children}
+        </Menu.Item>
     );
 }
 

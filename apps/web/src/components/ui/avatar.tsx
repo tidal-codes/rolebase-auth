@@ -1,14 +1,14 @@
-import { Avatar as BaseAvatar } from "@chakra-ui/react";
+import { Avatar as BaseAvatar, type AvatarRootProps } from "@chakra-ui/react";
 
-interface AvatarProps {
+interface AvatarPropsType extends AvatarRootProps {
     name: string,
     size?: "xs" | "xl" | "sm" | "md" | "lg"
 }
 
-const Avatar = ({ name, size = "md" }: AvatarProps) => {
+const Avatar = ({ name, size = "md", ...rest }: AvatarPropsType) => {
 
     return (
-        <BaseAvatar.Root variant="solid" size={size}>
+        <BaseAvatar.Root {...rest} variant="solid" size={size}>
             <BaseAvatar.Fallback name={name} />
         </BaseAvatar.Root>
     )

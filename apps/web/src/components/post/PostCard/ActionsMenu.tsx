@@ -1,17 +1,20 @@
 import { Button, Spinner } from '@chakra-ui/react';
-import { Delete, Edit, EllipsisVertical, Pencil, Trash } from 'lucide-react';
+import { EllipsisVertical, Pencil, Trash } from 'lucide-react';
 import { usePostStore } from '../../../stores/posts';
 import Menu from '../../ui/menu';
 import { useState } from 'react';
 import MenuItem from '../../ui/menuItem';
+import { useDeletePost } from '../../../hooks/post/queries';
+import usePostDialog from '../../../hooks/post/usePostDialog';
 
 interface ActionsMenuProps {
     postId: string
 }
 
 const ActionsMenu = ({ postId }: ActionsMenuProps) => {
-    const postsById = usePostStore(state => state.postsById);
-    const { pending } = postsById[postId];
+    const pending = usePostStore(state => state.postsById[postId].pending);
+    const { handleOpen } = usePostDialog();
+    const { deletePost } = useDeletePost(postId);
     const [open, setOpen] = useState(false);
     return (
         <>
@@ -34,14 +37,18 @@ const ActionsMenu = ({ postId }: ActionsMenuProps) => {
                     >
                         <MenuItem
                             value='edit-post'
-                            onClick={() => console.log(postId)}
+                            onClick={() => handleOpen(true, postId)}
                         >
                             <Pencil />
                             Edit Post
                         </MenuItem>
                         <MenuItem
                             value='delete-post'
-                            onClick={() => console.log(postId)}
+                            onClick={() => deletePost()}
+                            color="fg.error"
+                            _hover={{
+                                bgColor: "bg.error"
+                            }}
                         >
                             <Trash />
                             Delete Post

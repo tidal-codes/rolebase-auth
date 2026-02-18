@@ -3,7 +3,8 @@ import type { postSchema } from "../hooks/post/forms"
 
 export interface PostDialogContextType {
     open: boolean,
-    handleOpen: (open: boolean) => void,
+    defaultPostId: string | null,
+    handleOpen: (open: boolean, defaultPostId?: string) => void,
     toggleOpen: () => void
 }
 export type PostForm = z.infer<typeof postSchema>;

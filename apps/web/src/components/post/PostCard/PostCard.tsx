@@ -1,17 +1,32 @@
 import { usePostStore } from "../../../stores/posts";
 import Actions from "./Actions";
 import Avatar from "../../ui/avatar";
-import { Flex, Text, Box, Button } from "@chakra-ui/react";
+import { Flex, Text, Box } from "@chakra-ui/react";
 import ActionsMenu from "./ActionsMenu";
+import { useLayoutEffect, useState } from "react";
+import React from "react";
 
 interface PostCardProps {
     postId: string
 
 }
 
+const colorPaletteArray = ["red", "blue", "green", "yellow", "purple", "orange"]
+
 const PostCard = ({ postId }: PostCardProps) => {
-    const postsById = usePostStore(state => state.postsById);
-    const { title, body, liked, saved, author: { full_name } } = postsById[postId];
+    const body = usePostStore(state => state.postsById[postId]?.body);
+    const title = usePostStore(state => state.postsById[postId]?.title);
+    const authorName = usePostStore(state => state.postsById[postId]?.author.full_name);
+    if (!body || !title || !authorName) return null;
+    const [colorPalette, setColorPalette] = useState<string | undefined>(undefined);
+
+    useLayoutEffect(() => {
+        const index = authorName.charCodeAt(0) % colorPaletteArray.length;
+        setColorPalette(colorPaletteArray[index])
+    }, [authorName, setColorPalette])
+
+    console.log("re render");
+
     return (
         <Box
             p="1"
@@ -41,7 +56,7 @@ const PostCard = ({ postId }: PostCardProps) => {
                 backgroundColor="white"
             >
                 <Flex alignItems="center" justifyContent="space-between">
-                    <Text fontSize="lg">{title}</Text>
+                    <Text fontSize="lg" truncate>{title}</Text>
                     <ActionsMenu postId={postId} />
                 </Flex>
 
@@ -51,13 +66,13 @@ const PostCard = ({ postId }: PostCardProps) => {
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Actions
-                        postId={postId}
-                        liked={liked}
-                        saved={saved}
-                    />
+                    <Actions postId={postId} />
                     <Box>
-                        <Avatar name={full_name} size="sm" />
+                        <Avatar
+                            colorPalette={colorPalette}
+                            name={authorName}
+                            size="sm"
+                        />
                     </Box>
                 </Flex>
             </Flex>
@@ -65,4 +80,4 @@ const PostCard = ({ postId }: PostCardProps) => {
     );
 }
 
-export default PostCard;
+export default React.memo(PostCard);

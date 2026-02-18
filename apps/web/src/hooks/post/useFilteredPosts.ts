@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { usePostStore, usePostViewStore } from "../../stores/posts";
+import { usePostStore } from "../../stores/posts";
 import { useSearchStore } from "../../stores/search";
+import type { PostView } from "../../@types/post";
 
-export default function useFilteredPosts() {
-    const { view } = usePostViewStore();
+export default function useFilteredPosts(view: PostView) {
     const { search, setSearchResultCount } = useSearchStore();
     const postIds = usePostStore(state => state.postIds);
     const postsById = usePostStore(state => state.postsById);

@@ -102,3 +102,56 @@ export function useBookmark() {
         save: mutation.mutate,
     }
 }
+
+export function useDeletePost(postId: string) {
+    const removePost = usePostStore(state => state.removePost);
+    const addPost = usePostStore(state => state.addPost);
+    const getPost = usePostStore.getState;
+
+    const mutation = useMutation({
+        mutationFn: () => postApi.delete({ postId }),
+
+        onMutate: () => {
+            const current = getPost().postsById[postId];
+            removePost(postId);
+            return { current };
+        },
+
+        onError: (error, _, ctx) => {
+            if (ctx?.current) {
+                addPost(ctx.current);
+            }
+            toast.error(error.message);
+        },
+    });
+
+    return {
+        deletePost: mutation.mutate,
+    };
+}
+
+
+export function useUpdatePost() {
+    const updatePost = usePostStore(state => state.updatePost);
+    const postsById = usePostStore(state => state.postsById);
+    const mutation = useMutation({
+        mutationFn: ({ postId, title, body }: { postId: string, title: string, body: string }) => {
+            return postApi.update({ id: postId, body, title })
+        },
+        onMutate: ({ postId, title, body }) => {
+            updatePost(postId, { body, title, pending: true });
+            return { post: postsById[postId] };
+        },
+        onError: (error, _var, context) => {
+            updatePost(context!.post.id, { title: context!.post.title, body: context!.post.body, pending: false });
+            toast.error(error.message);
+        },
+        onSuccess: (_data, _var, context) => {
+            updatePost(context!.post.id, { pending: false })
+        }
+    })
+
+    return {
+        updatePost: mutation.mutate,
+    }
+}

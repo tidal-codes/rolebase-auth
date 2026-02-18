@@ -6,7 +6,12 @@ import usePostEditor from "../../hooks/post/usePostEditor";
 
 const PostDialog = () => {
     const { register, reset, handleSubmit, errors } = usePostForm();
-    const { addPost, openDialog, setOpenDialog } = usePostEditor({ handleSubmit , reset});
+    const {
+        submit,
+        openDialog,
+        defaultPostId,
+        setOpenDialog
+    } = usePostEditor({ handleSubmit, reset });
     return (
         <Dialog
             open={openDialog}
@@ -52,10 +57,10 @@ const PostDialog = () => {
                         <Button
                             size="xs"
                             onClick={() => {
-                                addPost();
+                                submit();
                             }}
                         >
-                            publish
+                            {defaultPostId ? "update" : "publish"}
                         </Button>
                         <Button
                             variant="subtle"
